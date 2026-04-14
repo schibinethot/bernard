@@ -1,7 +1,7 @@
 # bernard-cc-plugin
 
 **BERNARD as a Service** — Plugin Claude Code qui transforme votre CLI en une equipe complete :
-un orchestrateur, 17 agents specialises, 6 commandes workflow, 4 skills, 3 hooks de garde et
+un orchestrateur, 17 agents specialises, 6 commandes workflow, 7 skills, 5 hooks de garde et
 un MCP de memoire partagee.
 
 > Licence commerciale. 30 jours d'evaluation gratuite. Voir [LICENSE](./LICENSE).
@@ -35,7 +35,7 @@ coordination documentee :
 | `/briefing` | Digest matin : emails + agenda + ClickUp + projets |
 | `/compact` | Compaction des memories agents (fusion + supersede) |
 
-### 4 skills auto-declenchees
+### 7 skills auto-declenchees
 
 | Skill | Quand |
 |---|---|
@@ -43,14 +43,19 @@ coordination documentee :
 | `audit-crm` | Audit dedie CRM / ERP multi-modules |
 | `simplify` | Revue de simplification avant PR |
 | `migrate-feedbacks` | Migration des regles perso vers agent-memory |
+| `am-sql-preprod-deploy` | Script SQL preprod avant promote prod (Drizzle + Neon) |
+| `am-supabase-ddl-deploy` | Deploy DDL Supabase autonome via psql (jamais demander a l'user) |
+| `am-email-content-rules` | Checklist contenu email AM (ton, photos, Cloudinary, vocabulaire) |
 
-### 3 hooks de garde
+### 5 hooks de garde
 
 | Event | Script | Role |
 |---|---|---|
 | `PreToolUse` (Bash) | `guard.sh` | Bloque git force-push, rm -rf /, SQL destructeur |
 | `PostToolUse` (Write/Edit) | `post-write-lint.sh` | Lance `eslint --fix` sur les TS/JS |
+| `SubagentStop` | `elena-casey-enforcer.sh` | Rappelle ELENA + CASEY apres SEBASTIEN/REMI/MORGAN sur projet critique |
 | `SessionEnd` | `stop-auto-memory.sh` | Demande a Claude de memoriser les learnings |
+| `SessionEnd` | `memory-hygiene.sh` | Warn si BERNARD depasse 5 memories/session |
 
 ### 1 serveur MCP
 
@@ -168,17 +173,22 @@ bernard-cc-plugin/
     plugin.json            # manifeste
   agents/                  # 18 agents (.md avec frontmatter)
   commands/                # 6 commandes workflow
-  skills/                  # 4 skills autonomes
+  skills/                  # 7 skills autonomes
     audit-project/SKILL.md
     audit-crm/SKILL.md
     simplify/SKILL.md
     migrate-feedbacks/SKILL.md
+    am-sql-preprod-deploy/SKILL.md
+    am-supabase-ddl-deploy/SKILL.md
+    am-email-content-rules/SKILL.md
   hooks/
     hooks.json             # config events
     scripts/
       guard.sh
       post-write-lint.sh
+      elena-casey-enforcer.sh
       stop-auto-memory.sh
+      memory-hygiene.sh
   .mcp.json                # config MCP agent-memory
   .env.example
   LICENSE
@@ -257,10 +267,12 @@ les commandes locales ont priorite sur celles du plugin.
 
 ## Roadmap (non contractuelle)
 
-- [ ] v0.2 — Hook Stop-compact (compaction auto des memoires toutes les N sessions)
-- [ ] v0.3 — Skill `cost-tracker` (suivi cout LLM par agent)
-- [ ] v0.4 — Commandes `/focus`, `/digest`, `/speculate` (cockpit quotidien)
-- [ ] v0.5 — Templates projets (web SaaS, mobile, e-commerce)
+- [x] v0.2 — Integration P0 MORGAN : enforcer ELENA/CASEY + 3 skills AM (SQL preprod, Supabase DDL, email content) + memory-hygiene
+- [ ] v0.3 — Command `/bernard worktree-split` + skill `bernard-parallel-worktree` + hook `worktree-gitignore-check`
+- [ ] v0.4 — Skills P1 : `am-promote-branch-sync`, `email-cron-create`, `social-caption-generate`, `am-social-postproxy-publish`
+- [ ] v0.5 — Skill `cost-tracker` (suivi cout LLM par agent)
+- [ ] v0.6 — Commandes `/focus`, `/digest`, `/speculate` (cockpit quotidien)
+- [ ] v0.7 — Templates projets (web SaaS, mobile, e-commerce)
 - [ ] v1.0 — Dashboard web de gouvernance des agents
 
 ---

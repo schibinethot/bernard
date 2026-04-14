@@ -1,7 +1,7 @@
 {
   "name": "bernard-cc-plugin",
-  "version": "0.1.0",
-  "description": "BERNARD as a Service — Orchestrateur Claude Code + 16 agents specialises (tech, produit, design, ops, finance, legal, secu, data, AI tooling) + commandes workflow + skills d'audit + hooks de garde + MCP agent-memory",
+  "version": "0.2.0",
+  "description": "BERNARD as a Service — Orchestrateur Claude Code + 17 agents specialises (tech, produit, design, ops, finance, legal, secu, data, AI tooling) + commandes workflow + skills d'audit et de deploy AM + hooks de garde (guard, enforcer ELENA/CASEY, memory-hygiene) + MCP agent-memory",
   "author": {
     "name": "BERNARD — Atelier Tpmge",
     "email": "hello@bernard.as",
