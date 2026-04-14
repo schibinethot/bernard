@@ -1,0 +1,23 @@
+{
+  "name": "bernard-cc-plugin",
+  "version": "0.1.0",
+  "description": "BERNARD as a Service — Orchestrateur Claude Code + 16 agents specialises (tech, produit, design, ops, finance, legal, secu, data, AI tooling) + commandes workflow + skills d'audit + hooks de garde + MCP agent-memory",
+  "author": {
+    "name": "BERNARD — Atelier Tpmge",
+    "email": "hello@bernard.as",
+    "url": "https://bernard.as"
+  },
+  "homepage": "https://bernard.as",
+  "repository": "https://github.com/tpmge/bernard-cc-plugin",
+  "license": "SEE LICENSE IN LICENSE",
+  "keywords": [
+    "orchestrator",
+    "multi-agent",
+    "claude-code",
+    "agents",
+    "bernard",
+    "workflow",
+    "saas",
+    "fullstack"
+  ]
+}

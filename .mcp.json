@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "agent-memory": {
+      "type": "http",
+      "url": "${AGENT_MEMORY_URL}/mcp",
+      "headers": {
+        "Authorization": "Bearer ${AGENT_MEMORY_TOKEN}"
+      }
+    }
+  }
+}

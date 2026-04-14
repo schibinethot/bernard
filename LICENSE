@@ -1,0 +1,44 @@
+BERNARD AS A SERVICE — LICENCE COMMERCIALE (v1, avril 2026)
+
+Copyright (c) 2026 Atelier Tpmge / BERNARD-as-a-Service. Tous droits reserves.
+
+1. OBJET
+Le present logiciel — "bernard-cc-plugin" — comprenant la configuration du
+plugin, les 16 agents, les commandes, skills, hooks et scripts associes, est
+mis a disposition sous les conditions ci-dessous. Il n'est PAS un logiciel
+open source.
+
+2. DROIT D'EVALUATION (gratuit, 30 jours)
+Toute personne physique peut installer le plugin a titre d'evaluation
+personnelle pendant une periode maximale de 30 jours calendaires.
+Toute utilisation commerciale, en equipe ou en production au-dela de cette
+periode necessite une licence payante.
+
+3. LICENCES COMMERCIALES
+Trois offres sont disponibles :
+  - Solo ......... 149 EUR / mois — 1 utilisateur, projets illimites
+  - Agence ....... 599 EUR / mois — 5 utilisateurs, support email
+  - Scale ....... 1990 EUR / mois — 20+ utilisateurs, SLA, onboarding, agents
+                                    custom, deploy MCP dedie
+
+4. INTERDICTIONS
+Sans accord ecrit, il est interdit de :
+  (a) redistribuer, revendre ou sous-licencier le plugin,
+  (b) utiliser les marques "BERNARD", "BERNARD-as-a-Service",
+  (c) extraire les prompts d'agents pour creer un produit concurrent,
+  (d) utiliser le plugin pour former un modele ML.
+
+5. PROPRIETE INTELLECTUELLE
+Le code, les prompts, les noms d'agents et la methodologie restent la
+propriete exclusive de l'auteur. L'utilisateur ne recoit qu'un droit
+d'usage non exclusif et non transferable.
+
+6. ABSENCE DE GARANTIE
+Le plugin est fourni "EN L'ETAT". L'auteur ne garantit pas l'absence de
+bug ni l'adequation a un usage particulier. La responsabilite est limitee
+au montant paye sur les 12 derniers mois.
+
+7. DROIT APPLICABLE
+Droit francais. Tribunal competent : Paris.
+
+Pour obtenir une licence : hello@bernard.as
