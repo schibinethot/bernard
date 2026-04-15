@@ -94,3 +94,55 @@ n'est pas disponible — la section concernee est simplement omise du rapport.
 
 Contrainte explicite dans chaque agent et commande : `Repondre en francais.` — adaptation
 au profil utilisateur cible (dev full-stack francophone).
+
+## 13. Worktrees paralleles (hub-and-spoke)
+
+Pattern 2026 : quand un chantier mobilise plusieurs agents en meme temps et qu'ils touchent
+potentiellement les memes fichiers, on ne les lance pas tous dans le meme workspace — ca
+cree des collisions filesystem et des conflits git violents. A la place, on applique le
+pattern **hub-and-spoke + worktrees** :
+
+- Le hub (BERNARD) cree N worktrees git isoles via `git worktree add`, un par agent.
+- Chaque agent (spoke) bosse dans son worktree, sur une branche dediee, sans voir les
+  autres.
+- Le hub merge les branches a la fin selon la strategie choisie (`sequential`, `octopus`
+  ou `manual`).
+
+### Quand utiliser `/bernard-worktree-split`
+
+- Plusieurs agents mutent le meme fichier (ex SEBASTIEN + REMI sur `src/app.ts`).
+- Branches differentes a livrer en parallele (ex `feature/api` + `feature/ui`).
+- Besoin de revue independante de chaque sous-chantier avant merge.
+- Chantier moyen / gros (> 30 min de travail cumule entre agents).
+
+### Quand NE PAS utiliser
+
+- Specs, design ou reflexion sans mutation de fichier — un simple fan-out Task suffit.
+- Backend + frontend sur des dossiers disjoints (`server/` vs `client/`) et aucun
+  fichier partage — overhead inutile, pref un seul workspace.
+- Tache courte (< 10 min) — le cout de setup des worktrees depasse le gain.
+- Un seul agent : pas de parallelisme a extraire, inutile.
+
+### Exemple concret
+
+Chantier "refactor endpoint `/orders` + mise a jour UI + tests" avec 3 agents :
+
+```bash
+/bernard-worktree-split "refactor orders endpoint" --agents sebastien,remi,elena \
+  --merge-strategy sequential --base main
+```
+
+BERNARD cree `.worktrees/orders-sebastien`, `.worktrees/orders-remi`,
+`.worktrees/orders-elena`, delegue en parallele, puis merge
+`bernard/wt/orders-sebastien` → `bernard/wt/orders-remi` → `bernard/wt/orders-elena`
+dans `main`.
+
+### Hooks connexes
+
+- `worktree-gitignore-check.sh` (PreToolUse Bash) bloque `git add .worktrees/` et
+  `git add .` si `.worktrees/` n'est pas dans `.gitignore` — garde-fou obligatoire.
+- `branch-sync-reminder.sh` (PostToolUse Bash) rappelle la sync preprod apres un merge
+  sur `main` des projets AM critiques.
+
+Voir `commands/bernard-worktree-split.md` pour le detail des 5 phases (pre-flight,
+matrice de collision, creation, delegation, merge) et le parser d'arguments.

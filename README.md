@@ -335,6 +335,22 @@ les commandes locales ont priorite sur celles du plugin.
 
 ## Changelog
 
+### v0.3.1 — 2026-04-15 (fast-follow QA ELENA)
+
+Patch rapide sur deux items identifies par ELENA apres v0.3.0.
+
+- fix(hook) : `guard.sh` ligne 29 — pattern `git checkout \.` passait a `grep -qiF`
+  (fixed strings), donc le `\.` etait litteral et rien ne matchait en pratique.
+  Passe en regex `grep -qiE 'git checkout +\.( |$)'` pour matcher precisement
+  `git checkout .` (avec espaces optionnels) sans faux positifs sur
+  `git checkout file.txt` ou `git checkout main`. Non-regression verifiee sur
+  les 8 smoke cases ELENA (4 cas git checkout + 4 cas autres patterns).
+- docs(patterns) : nouvelle section "Worktrees paralleles" dans
+  `docs/PATTERNS-2026.md` — documente le pattern hub-and-spoke + worktrees,
+  quand utiliser `/bernard-worktree-split` (mutations chevauchantes), quand
+  l'eviter (specs, paths disjoints, tache courte), exemple concret et hooks
+  connexes (`worktree-gitignore-check`, `branch-sync-reminder`).
+
 ### v0.3.0 — 2026-04-15 (worktrees paralleles + skills AM P1)
 
 **Minor bump majeur** : nouvelle architecture de travail parallele via worktrees git isoles + 3 skills P1 qui ferment les boucles de feedback critiques AM (branches iso, cron anti-backfill, social via PostProxy).

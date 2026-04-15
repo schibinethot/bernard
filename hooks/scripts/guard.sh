@@ -26,12 +26,12 @@ else:
     print(cmd)
 " 2>/dev/null || echo "$COMMAND")
 
-GIT_PATTERNS=("git push --force" "git push -f " "git reset --hard" "git checkout \.")
+# Patterns litteraux (fixed strings)
+GIT_PATTERNS=("git push --force" "git push -f " "git reset --hard")
 GIT_DESCRIPTIONS=(
   "git push --force (ecrasement distant)"
   "git push -f (ecrasement distant)"
   "git reset --hard (perte de changes)"
-  "git checkout . (perte de changes)"
 )
 
 for i in "${!GIT_PATTERNS[@]}"; do
@@ -40,6 +40,13 @@ for i in "${!GIT_PATTERNS[@]}"; do
     exit 2
   fi
 done
+
+# Pattern regex : git checkout . (avec espaces optionnels, fin de ligne ou suivi d'espaces)
+# En -F le \. serait litteral, donc on passe en -E pour matcher precisement "git checkout ."
+if echo "$BASE_CMD" | grep -qiE 'git checkout +\.( |$)'; then
+  echo "[bernard-guard] Commande dangereuse detectee : git checkout . (perte de changes). Reformule avec une approche plus sure." >&2
+  exit 2
+fi
 
 # Filesystem destructeur
 if echo "$BASE_CMD" | grep -qiF "rm -rf /"; then
