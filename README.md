@@ -1,8 +1,8 @@
 # bernard (plugin Claude Code)
 
 **BERNARD as a Service** — Plugin Claude Code qui transforme votre CLI en une equipe complete :
-un orchestrateur BERNARD + 17 experts specialises (18 agents au total), 6 commandes workflow,
-7 skills, 5 hooks de garde et un MCP de memoire partagee.
+un orchestrateur BERNARD + 17 experts specialises (18 agents au total), 7 commandes workflow,
+10 skills, 7 hooks de garde et un MCP de memoire partagee.
 
 > Licence commerciale. 30 jours d'evaluation gratuite. Voir [LICENSE](./LICENSE).
 
@@ -25,18 +25,19 @@ coordination documentee. Namespace runtime : `bernard:<agent>` (ex `bernard:seba
 | Data / Business | `iris`, `jordan`, `thomas`, `laure`, `mika`, `rebecca` |
 | Veille | `claire`, `nova` |
 
-### 6 commandes workflow
+### 7 commandes workflow
 
 | Commande | Role |
 |---|---|
 | `/bernard` | Discussion libre ou routing vers un agent expert |
+| `/bernard-worktree-split` | Orchestre N agents en parallele sur worktrees git isoles, merge sequential/octopus/manual |
 | `/retro` | Retrospective automatique des executions passees |
 | `/auto-improve` | Cycle complet retro + apply + compact + cross-scan |
 | `/cross-scan` | Scan cross-projets des patterns d'erreur connus |
 | `/briefing` | Digest matin : emails + agenda + ClickUp + projets |
 | `/compact` | Compaction des memories agents (fusion + supersede) |
 
-### 7 skills auto-declenchees
+### 10 skills auto-declenchees
 
 | Skill | Quand |
 |---|---|
@@ -47,13 +48,18 @@ coordination documentee. Namespace runtime : `bernard:<agent>` (ex `bernard:seba
 | `am-sql-preprod-deploy` | Script SQL preprod avant promote prod (Drizzle + Neon) |
 | `am-supabase-ddl-deploy` | Deploy DDL Supabase autonome via psql (jamais demander a l'user) |
 | `am-email-content-rules` | Checklist contenu email AM (ton, photos, Cloudinary, vocabulaire) |
+| `am-promote-branch-sync` | Sync preprod <- main apres git promote sur projet AM critique (feedback_branches_iso) |
+| `email-cron-create` | Creer un cron email nurturing avec pattern anti-backfill (CRON_CREATED_AT + fenetre 24h) |
+| `am-social-postproxy-publish` | Publier post social AM via PostProxy, payload top-level (profiles/media/platforms) |
 
-### 5 hooks de garde
+### 7 hooks de garde
 
 | Event | Script | Role |
 |---|---|---|
 | `PreToolUse` (Bash) | `guard.sh` | Bloque git force-push, rm -rf /, SQL destructeur |
+| `PreToolUse` (Bash) | `worktree-gitignore-check.sh` | Bloque `git add .worktrees/` et `git add .` si .worktrees absent de .gitignore |
 | `PostToolUse` (Write/Edit) | `post-write-lint.sh` | Lance `eslint --fix` sur les TS/JS |
+| `PostToolUse` (Bash) | `branch-sync-reminder.sh` | Rappelle skill am-promote-branch-sync apres push origin main sur projet critique |
 | `SubagentStop` | `elena-casey-enforcer.sh` | Rappelle ELENA + CASEY apres SEBASTIEN/REMI/MORGAN sur projet critique |
 | `SessionEnd` | `stop-auto-memory.sh` | Demande a Claude de memoriser les learnings |
 | `SessionEnd` | `memory-hygiene.sh` | Warn si BERNARD depasse 5 memories/session |
@@ -216,8 +222,8 @@ bernard/                   # name dans plugin.json ; repo = schibinethot/bernard
     plugin.json            # manifeste du plugin
     marketplace.json       # wrapper marketplace pour distribution /plugin marketplace add
   agents/                  # 18 agents (.md avec frontmatter)
-  commands/                # 6 commandes workflow
-  skills/                  # 7 skills autonomes
+  commands/                # 7 commandes workflow
+  skills/                  # 10 skills autonomes
     audit-project/SKILL.md
     audit-crm/SKILL.md
     simplify/SKILL.md
@@ -225,11 +231,16 @@ bernard/                   # name dans plugin.json ; repo = schibinethot/bernard
     am-sql-preprod-deploy/SKILL.md
     am-supabase-ddl-deploy/SKILL.md
     am-email-content-rules/SKILL.md
+    am-promote-branch-sync/SKILL.md
+    email-cron-create/SKILL.md
+    am-social-postproxy-publish/SKILL.md
   hooks/
     hooks.json             # config events
     scripts/
       guard.sh
+      worktree-gitignore-check.sh
       post-write-lint.sh
+      branch-sync-reminder.sh
       elena-casey-enforcer.sh
       stop-auto-memory.sh
       memory-hygiene.sh
@@ -313,8 +324,8 @@ les commandes locales ont priorite sur celles du plugin.
 
 - [x] v0.2 — Integration P0 MORGAN : enforcer ELENA/CASEY + 3 skills AM (SQL preprod, Supabase DDL, email content) + memory-hygiene
 - [x] v0.2.1 — Fixes QA ELENA : hooks.json wrapper, namespace plugin renomme `bernard`, scripts hooks chmod +x, count agents harmonise (18), section Install reecrite, collision `/bernard` documentee
-- [ ] v0.3 — Command `/bernard worktree-split` + skill `bernard-parallel-worktree` + hook `worktree-gitignore-check`
-- [ ] v0.4 — Skills P1 : `am-promote-branch-sync`, `email-cron-create`, `social-caption-generate`, `am-social-postproxy-publish`
+- [x] v0.3 — Command `/bernard-worktree-split` + 3 skills P1 (`am-promote-branch-sync`, `email-cron-create`, `am-social-postproxy-publish`) + 2 hooks (`worktree-gitignore-check`, `branch-sync-reminder`)
+- [ ] v0.4 — Skill `social-caption-generate` + hook `cron-date-filter-check` + polish tests
 - [ ] v0.5 — Skill `cost-tracker` (suivi cout LLM par agent)
 - [ ] v0.6 — Commandes `/focus`, `/digest`, `/speculate` (cockpit quotidien)
 - [ ] v0.7 — Templates projets (web SaaS, mobile, e-commerce)
@@ -323,6 +334,28 @@ les commandes locales ont priorite sur celles du plugin.
 ---
 
 ## Changelog
+
+### v0.3.0 — 2026-04-15 (worktrees paralleles + skills AM P1)
+
+**Minor bump majeur** : nouvelle architecture de travail parallele via worktrees git isoles + 3 skills P1 qui ferment les boucles de feedback critiques AM (branches iso, cron anti-backfill, social via PostProxy).
+
+**Nouveautes**
+- feat(command) : `/bernard-worktree-split <chantier>` pour orchestrer N agents en parallele sur worktrees git isoles. 5 phases (pre-flight, matrice collision, creation worktrees, delegation parallele, merge). Strategies : `sequential` | `octopus` | `manual`. Tracing MCP integre.
+- feat(skill) : `am-promote-branch-sync` — sync preprod <- main apres git promote sur projet AM critique (ERP-AM, SITE-AM, APP-NELVO, CRM-ESC-PACK). Detection drift post-merge avec whitelist. Implemente `feedback_branches_iso`.
+- feat(skill) : `email-cron-create` — template Drizzle/TS pour crons email nurturing avec pattern anti-backfill (`CRON_CREATED_AT` hardcode + fenetre 24h + LEFT JOIN idempotent). Checklist 6 items anti-spam. Implemente `feedback_cron_historical_backfill`.
+- feat(skill) : `am-social-postproxy-publish` — publication sociale AM via PostProxy exclusivement, payload top-level (profiles/media/platforms). Contre-exemple du piege recurrent `{ post: {...} }`. Retry backoff expo sur 5xx. Implemente `feedback_postproxy` + `reference_postproxy_api`.
+- feat(hook) : `worktree-gitignore-check.sh` (PreToolUse Bash) — bloque `git add .worktrees/` et `git add .` si `.worktrees/` absent du `.gitignore`. Compagnon obligatoire de `/bernard-worktree-split`.
+- feat(hook) : `branch-sync-reminder.sh` (PostToolUse Bash) — apres `git push origin main` sur projet critique AM, rappelle de lancer le skill `am-promote-branch-sync`.
+
+**Specs**
+- MORGAN v2 a livre les specs detaillees via scratchpad MCP (`morgan_plugin_v03_specs_15avril`).
+- Implementation SEBASTIEN (backend : command + 3 skills) + LEO (devops : 2 hooks).
+
+**Compteurs**
+- Commandes : 6 → 7 (+1)
+- Skills : 7 → 10 (+3)
+- Hooks : 5 → 7 (+2)
+- Agents : 18 (inchange)
 
 ### v0.2.2 — 2026-04-14 (distribution marketplace)
 - feat : `.claude-plugin/marketplace.json` wrapper ajoute pour distribution via `/plugin marketplace add`.
