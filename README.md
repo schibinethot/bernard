@@ -325,7 +325,7 @@ les commandes locales ont priorite sur celles du plugin.
 - [x] v0.2 — Integration P0 MORGAN : enforcer ELENA/CASEY + 3 skills AM (SQL preprod, Supabase DDL, email content) + memory-hygiene
 - [x] v0.2.1 — Fixes QA ELENA : hooks.json wrapper, namespace plugin renomme `bernard`, scripts hooks chmod +x, count agents harmonise (18), section Install reecrite, collision `/bernard` documentee
 - [x] v0.3 — Command `/bernard-worktree-split` + 3 skills P1 (`am-promote-branch-sync`, `email-cron-create`, `am-social-postproxy-publish`) + 2 hooks (`worktree-gitignore-check`, `branch-sync-reminder`)
-- [ ] v0.4 — Skill `social-caption-generate` + hook `cron-date-filter-check` + polish tests
+- [x] v0.4 — Skill `social-caption-generate` + hook `cron-date-filter-check`
 - [ ] v0.5 — Skill `cost-tracker` (suivi cout LLM par agent)
 - [ ] v0.6 — Commandes `/focus`, `/digest`, `/speculate` (cockpit quotidien)
 - [ ] v0.7 — Templates projets (web SaaS, mobile, e-commerce)
@@ -334,6 +334,20 @@ les commandes locales ont priorite sur celles du plugin.
 ---
 
 ## Changelog
+
+### v0.4.0 — 2026-04-15 (content editorial + cron guard)
+
+**Minor bump** : skill social media AM (REMI) + hook lint cron anti-backfill (LEO). Ferme la roadmap v0.4 P2.
+
+**Nouveautes**
+- feat(skill) : `social-caption-generate` — genere captions Instagram/Facebook/LinkedIn conformes aux regles AM (francais, pas de tiret cadratin, hashtags EN OK, ton Charvet/Hermes, Paris 7e, Cloudinary w_600,q_auto,f_auto). Templates par plateforme + exemples corrects + contre-exemple detaille. Implemente `feedback_social_content_rules` + `feedback_am_email_content`.
+- feat(hook) : `cron-date-filter-check.sh` (PostToolUse Write|Edit) — scan ts/tsx/js/mjs/sql pour detecter crons sans filtre `created_at > CRON_CREATED_AT`. Warn non-bloquant. Implemente `feedback_cron_historical_backfill`.
+
+**Compteurs**
+- Commandes : 7 (inchange)
+- Skills : 10 → 11 (+1)
+- Hooks : 7 → 8 (+1)
+- Agents : 18 (inchange)
 
 ### v0.3.1 — 2026-04-15 (fast-follow QA ELENA)
 
