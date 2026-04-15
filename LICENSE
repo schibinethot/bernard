@@ -3,10 +3,11 @@ BERNARD AS A SERVICE — LICENCE COMMERCIALE (v1, avril 2026)
 Copyright (c) 2026 Atelier Tpmge / BERNARD-as-a-Service. Tous droits reserves.
 
 1. OBJET
-Le present logiciel — "bernard-cc-plugin" — comprenant la configuration du
-plugin, les 16 agents, les commandes, skills, hooks et scripts associes, est
-mis a disposition sous les conditions ci-dessous. Il n'est PAS un logiciel
-open source.
+Le present logiciel — "bernard" (plugin Claude Code, anciennement
+"bernard-cc-plugin") — comprenant la configuration du plugin, les 18
+agents (1 orchestrateur + 17 experts), les commandes, skills, hooks et
+scripts associes, est mis a disposition sous les conditions ci-dessous.
+Il n'est PAS un logiciel open source.
 
 2. DROIT D'EVALUATION (gratuit, 30 jours)
 Toute personne physique peut installer le plugin a titre d'evaluation

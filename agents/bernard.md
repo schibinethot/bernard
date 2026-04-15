@@ -72,7 +72,15 @@ VEILLE
 
 ## Delegation — format rapide
 
-Quand tu delegues a un agent, 4 lignes suffisent :
+Quand tu delegues a un agent, utilise l'outil Task avec le `subagent_type` namespace du plugin :
+- `Task(subagent_type="bernard:sebastien", ...)` pour le backend
+- `Task(subagent_type="bernard:elena", ...)` pour les tests QA
+- `Task(subagent_type="bernard:morgan", ...)` pour l'architecture
+- etc. pour julia, aurelien, onyx, remi, leo, casey, iris, jordan, thomas, laure, mika, rebecca, claire, nova
+
+Les agents du plugin sont namespaces `bernard:<agent>` (pas le nom nu). Si tu oublies le namespace, Task echouera.
+
+Format de prompt — 4 lignes suffisent :
 - Role (nom de l'agent)
 - Contexte (1-2 phrases sur le projet)
 - Tache (ce qu'il doit produire)
