@@ -78,68 +78,57 @@ Doc officielle plugins Claude Code : https://docs.claude.com/en/docs/claude-code
 
 ### 2. Installer le plugin
 
-Le plugin expose un manifeste `plugin.json` (pas un marketplace). Trois options :
+Le plugin embarque son propre wrapper `marketplace.json` dans `.claude-plugin/`.
+Trois options :
 
-#### Option A — Dev local rapide (pas de marketplace requis)
+#### Option A — Install via marketplace GitHub (recommande)
 
-Demarrer Claude Code en pointant directement sur le dossier cloné :
+Depuis Claude Code, ajoute le marketplace BERNARD et installe le plugin :
 
 ```bash
-git clone https://github.com/tpmge/bernard-cc-plugin.git
-claude --plugin-dir /absolute/path/to/bernard-cc-plugin
+/plugin marketplace add schibinethot/bernard
+/plugin install bernard
 ```
 
-Cette approche est ideale pour essayer, iterer ou contribuer. Pas de registry ni de
-marketplace, le plugin est actif uniquement dans cette session.
+Ou en CLI :
 
-#### Option B — Reference dans votre `~/.claude/settings.json` user
+```bash
+claude plugin marketplace add schibinethot/bernard
+claude plugin install bernard@bernard
+```
 
-Clone le repo, puis ajoute le plugin dans votre config user Claude Code :
+Le repo est prive : il faut etre authentifie sur GitHub (`gh auth login` ou SSH config)
+et avoir acces au repo `schibinethot/bernard`. Les mises a jour se font via
+`/plugin marketplace update bernard` puis `/plugin update bernard`.
+
+#### Option B — Dev local rapide (clone + marketplace local)
+
+Clone le repo, puis pointe le marketplace sur le dossier local :
+
+```bash
+git clone https://github.com/schibinethot/bernard.git /absolute/path/to/bernard
+claude plugin marketplace add /absolute/path/to/bernard
+claude plugin install bernard@bernard
+```
+
+Ideal pour iterer sur le plugin ou contribuer.
+
+#### Option C — Reference dans votre `~/.claude/settings.json` user
+
+Clone le repo, puis declare le plugin dans votre config user Claude Code :
 
 ```json
 {
   "plugins": {
     "bernard": {
-      "path": "/absolute/path/to/bernard-cc-plugin"
+      "path": "/absolute/path/to/bernard"
     }
   }
 }
 ```
 
-Le plugin sera charge automatiquement a chaque session Claude Code.
-
-#### Option C — Publication via marketplace.json (partage interne ou public)
-
-Pour distribuer le plugin a une equipe ou au public, il faut un wrapper marketplace.
-Cree un fichier `.claude-plugin/marketplace.json` a la racine d'un repo separé (ex
-`tpmge/bernard-marketplace`) :
-
-```json
-{
-  "name": "bernard-marketplace",
-  "owner": { "name": "tpmge" },
-  "plugins": [
-    {
-      "name": "bernard",
-      "source": {
-        "type": "github",
-        "repository": "tpmge/bernard-cc-plugin"
-      },
-      "description": "BERNARD as a Service — orchestrateur + 17 experts"
-    }
-  ]
-}
-```
-
-Ensuite depuis Claude Code :
-
-```bash
-/plugin marketplace add tpmge/bernard-marketplace
-/plugin install bernard
-```
-
-Le marketplace est un repo GitHub (ou local) qui liste un ou plusieurs plugins. Chaque
-entree `plugins[]` pointe vers le vrai repo du plugin via `source.repository`.
+Le plugin sera charge automatiquement a chaque session Claude Code, sans passer par
+le systeme de marketplace.
 
 ### 3. Configurer les secrets
 
@@ -222,9 +211,10 @@ les invoquer explicitement depuis une commande custom.
 ## Architecture du plugin
 
 ```
-bernard/                   # name dans plugin.json ; repo = bernard-cc-plugin
+bernard/                   # name dans plugin.json ; repo = schibinethot/bernard
   .claude-plugin/
-    plugin.json            # manifeste
+    plugin.json            # manifeste du plugin
+    marketplace.json       # wrapper marketplace pour distribution /plugin marketplace add
   agents/                  # 18 agents (.md avec frontmatter)
   commands/                # 6 commandes workflow
   skills/                  # 7 skills autonomes
@@ -333,6 +323,12 @@ les commandes locales ont priorite sur celles du plugin.
 ---
 
 ## Changelog
+
+### v0.2.2 — 2026-04-14 (distribution marketplace)
+- feat : `.claude-plugin/marketplace.json` wrapper ajoute pour distribution via `/plugin marketplace add`.
+- feat : repo prive GitHub `schibinethot/bernard` cree pour installation facile (`/plugin marketplace add schibinethot/bernard`).
+- fix : `plugin.json.repository` pointe desormais sur `schibinethot/bernard` (au lieu de `tpmge/bernard-cc-plugin`).
+- docs : section Install reecrite avec marketplace GitHub en Option A primaire.
 
 ### v0.2.1 — 2026-04-14 (fixes QA ELENA)
 - fix P0 : `hooks/hooks.json` encapsule dans `{"hooks": { ... }}` (validator `claude plugin validate .` passe).
