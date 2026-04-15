@@ -1,0 +1,37 @@
+{
+  "name": "bernard",
+  "metadata": {
+    "description": "BERNARD — Orchestrateur multi-agents IA pour Claude Code (18 agents specialises, memoire MCP persistante, cost-aware tiering). Marketplace de distribution du plugin BERNARD as a Service."
+  },
+  "owner": {
+    "name": "BERNARD — Atelier Tpmge",
+    "email": "hello@bernard.as",
+    "url": "https://bernard.as"
+  },
+  "plugins": [
+    {
+      "name": "bernard",
+      "version": "0.2.1",
+      "description": "BERNARD as a Service — Orchestrateur Claude Code + 18 agents specialises (1 orchestrateur + 17 experts : tech, produit, design, ops, finance, legal, secu, data, AI tooling) + commandes workflow + skills d'audit et de deploy AM + hooks de garde (guard, enforcer ELENA/CASEY, memory-hygiene) + MCP agent-memory",
+      "author": {
+        "name": "BERNARD — Atelier Tpmge",
+        "email": "hello@bernard.as",
+        "url": "https://bernard.as"
+      },
+      "homepage": "https://bernard.as",
+      "license": "SEE LICENSE IN LICENSE",
+      "keywords": [
+        "orchestrator",
+        "multi-agent",
+        "claude-code",
+        "agents",
+        "bernard",
+        "workflow",
+        "saas",
+        "fullstack"
+      ],
+      "category": "productivity",
+      "source": "./"
+    }
+  ]
+}
