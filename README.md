@@ -2,7 +2,7 @@
 
 **BERNARD as a Service** — Plugin Claude Code qui transforme votre CLI en une equipe complete :
 un orchestrateur BERNARD + 17 experts specialises (18 agents au total), 7 commandes workflow,
-11 skills, 8 hooks de garde et un MCP de memoire partagee.
+12 skills, 8 hooks de garde et un MCP de memoire partagee.
 
 > Licence commerciale. 30 jours d'evaluation gratuite. Voir [LICENSE](./LICENSE).
 
@@ -37,7 +37,7 @@ coordination documentee. Namespace runtime : `bernard:<agent>` (ex `bernard:seba
 | `/briefing` | Digest matin : emails + agenda + ClickUp + projets |
 | `/compact` | Compaction des memories agents (fusion + supersede) |
 
-### 11 skills auto-declenchees
+### 12 skills auto-declenchees
 
 | Skill | Quand |
 |---|---|
@@ -52,6 +52,7 @@ coordination documentee. Namespace runtime : `bernard:<agent>` (ex `bernard:seba
 | `email-cron-create` | Creer un cron email nurturing avec pattern anti-backfill (CRON_CREATED_AT + fenetre 24h) |
 | `am-social-postproxy-publish` | Publier post social AM via PostProxy, payload top-level (profiles/media/platforms) |
 | `social-caption-generate` | Generer captions Instagram/Facebook/LinkedIn conformes aux regles AM |
+| `cost-tracker` | Analyse et estime les couts LLM par agent, modele et projet via MCP agent-memory |
 
 ### 8 hooks de garde
 
@@ -327,7 +328,7 @@ les commandes locales ont priorite sur celles du plugin.
 - [x] v0.2.1 — Fixes QA ELENA : hooks.json wrapper, namespace plugin renomme `bernard`, scripts hooks chmod +x, count agents harmonise (18), section Install reecrite, collision `/bernard` documentee
 - [x] v0.3 — Command `/bernard-worktree-split` + 3 skills P1 (`am-promote-branch-sync`, `email-cron-create`, `am-social-postproxy-publish`) + 2 hooks (`worktree-gitignore-check`, `branch-sync-reminder`)
 - [x] v0.4 — Skill `social-caption-generate` + hook `cron-date-filter-check`
-- [ ] v0.5 — Skill `cost-tracker` (suivi cout LLM par agent)
+- [x] v0.5 — Skill `cost-tracker` (suivi cout LLM par agent)
 - [ ] v0.6 — Commandes `/focus`, `/digest`, `/speculate` (cockpit quotidien)
 - [ ] v0.7 — Templates projets (web SaaS, mobile, e-commerce)
 - [ ] v1.0 — Dashboard web de gouvernance des agents
@@ -335,6 +336,19 @@ les commandes locales ont priorite sur celles du plugin.
 ---
 
 ## Changelog
+
+### v0.5.0 — 2026-04-16 (cost tracking)
+
+**Minor bump** : skill cost-tracker pour estimer les couts LLM par agent et par projet (IRIS).
+
+**Nouveautes**
+- feat(skill) : `cost-tracker` — analyse cout LLM par agent (routing Opus/Sonnet/Haiku), par projet, par periode. Grille tarifaire avril 2026. Hypotheses tokens par type d'interaction. Workflow 8 etapes via MCP agent-memory. Comparaison budget Bernard-as-a-Service (Solo/Agence/Scale). Recommandations downgrade.
+
+**Compteurs**
+- Commandes : 7 (inchange)
+- Skills : 11 → 12 (+1)
+- Hooks : 8 (inchange)
+- Agents : 18 (inchange)
 
 ### v0.4.0 — 2026-04-15 (content editorial + cron guard)
 

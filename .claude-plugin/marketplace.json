@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "bernard",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "description": "BERNARD as a Service — Orchestrateur Claude Code + 18 agents specialises (1 orchestrateur + 17 experts : tech, produit, design, ops, finance, legal, secu, data, AI tooling) + commandes workflow + skills d'audit et de deploy AM + hooks de garde (guard, enforcer ELENA/CASEY, memory-hygiene) + MCP agent-memory",
       "author": {
         "name": "BERNARD — Atelier Tpmge",
