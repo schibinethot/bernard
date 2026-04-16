@@ -2,7 +2,7 @@
 
 **BERNARD as a Service** — Plugin Claude Code qui transforme votre CLI en une equipe complete :
 un orchestrateur BERNARD + 17 experts specialises (18 agents au total), 7 commandes workflow,
-10 skills, 7 hooks de garde et un MCP de memoire partagee.
+11 skills, 8 hooks de garde et un MCP de memoire partagee.
 
 > Licence commerciale. 30 jours d'evaluation gratuite. Voir [LICENSE](./LICENSE).
 
@@ -37,7 +37,7 @@ coordination documentee. Namespace runtime : `bernard:<agent>` (ex `bernard:seba
 | `/briefing` | Digest matin : emails + agenda + ClickUp + projets |
 | `/compact` | Compaction des memories agents (fusion + supersede) |
 
-### 10 skills auto-declenchees
+### 11 skills auto-declenchees
 
 | Skill | Quand |
 |---|---|
@@ -51,8 +51,9 @@ coordination documentee. Namespace runtime : `bernard:<agent>` (ex `bernard:seba
 | `am-promote-branch-sync` | Sync preprod <- main apres git promote sur projet AM critique (feedback_branches_iso) |
 | `email-cron-create` | Creer un cron email nurturing avec pattern anti-backfill (CRON_CREATED_AT + fenetre 24h) |
 | `am-social-postproxy-publish` | Publier post social AM via PostProxy, payload top-level (profiles/media/platforms) |
+| `social-caption-generate` | Generer captions Instagram/Facebook/LinkedIn conformes aux regles AM |
 
-### 7 hooks de garde
+### 8 hooks de garde
 
 | Event | Script | Role |
 |---|---|---|
@@ -62,6 +63,7 @@ coordination documentee. Namespace runtime : `bernard:<agent>` (ex `bernard:seba
 | `PostToolUse` (Bash) | `branch-sync-reminder.sh` | Rappelle skill am-promote-branch-sync apres push origin main sur projet critique |
 | `SubagentStop` | `elena-casey-enforcer.sh` | Rappelle ELENA + CASEY apres SEBASTIEN/REMI/MORGAN sur projet critique |
 | `SessionEnd` | `stop-auto-memory.sh` | Demande a Claude de memoriser les learnings |
+| `PostToolUse` (Write/Edit) | `cron-date-filter-check.sh` | Detecte crons sans filtre date anti-backfill |
 | `SessionEnd` | `memory-hygiene.sh` | Warn si BERNARD depasse 5 memories/session |
 
 ### 1 serveur MCP
@@ -103,8 +105,7 @@ claude plugin marketplace add schibinethot/bernard
 claude plugin install bernard@bernard
 ```
 
-Le repo est prive : il faut etre authentifie sur GitHub (`gh auth login` ou SSH config)
-et avoir acces au repo `schibinethot/bernard`. Les mises a jour se font via
+Le repo est public. Les mises a jour se font via
 `/plugin marketplace update bernard` puis `/plugin update bernard`.
 
 #### Option B — Dev local rapide (clone + marketplace local)
