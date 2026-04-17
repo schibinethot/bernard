@@ -1,6 +1,6 @@
 {
   "name": "bernard-cc-plugin",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "BERNARD Claude Code plugin - CLI scripts (routines sync, etc.)",
   "private": true,
   "type": "module",

@@ -93,27 +93,45 @@ et est redeployable en une commande via `scripts/sync-routines.mjs`.
 - `routines/<nom>.yml` — metadata (id trigger, cron, env, model, tools, MCP connections, reference prompt)
 - `prompts/<nom>.md` — prompt complet de la routine (separe du YAML pour rester lisible)
 
+**Prompts templates (securise pour repo public)** :
+
+Les prompts dans `prompts/*.md` sont **templates** : ils contiennent des placeholders
+`${VAR}` pour les tokens et IDs sensibles (`${TELEGRAM_PUSH_TOKEN}`, `${TELEGRAM_BOT_TOKEN}`,
+`${AGENT_MEMORY_TOKEN}`, `${TELEGRAM_CHAT_ID}`, `${CLICKUP_WORKSPACE_ID}`,
+`${CLICKUP_CHAT_CHANNEL}`). Les vraies valeurs vivent dans un `.env` local a la racine
+du plugin (gitignore), jamais committe. Le script `sync-routines.mjs` charge ce `.env` et
+substitue les `${VAR}` avant le push vers `claude.ai/api/triggers`.
+
+Si une variable `${VAR}` referencee dans un prompt n'est pas definie en env, le script
+refuse de push et liste explicitement les cles manquantes.
+
 **Sync vers claude.ai** :
 
 ```bash
-# Recuperer le session token :
-#   claude.ai > DevTools > Application > Cookies > sessionKey (sk-ant-sid01-...)
+# 1. Copie .env.example -> .env et remplis les valeurs sensibles
+cp .env.example .env
+# edit .env : CLAUDE_SESSION_TOKEN (cookie sessionKey claude.ai), TELEGRAM_*, AGENT_MEMORY_TOKEN,
+# CLICKUP_WORKSPACE_ID, CLICKUP_CHAT_CHANNEL
 
-# Sync une seule routine (filtre sur le nom)
-CLAUDE_SESSION_TOKEN=sk-ant-sid01-... node scripts/sync-routines.mjs nova
+# 2. Sync une seule routine (filtre sur le nom)
+node scripts/sync-routines.mjs nova
 
-# Sync toutes les routines
-CLAUDE_SESSION_TOKEN=sk-ant-sid01-... node scripts/sync-routines.mjs
+# 3. Sync toutes les routines
+node scripts/sync-routines.mjs
 
-# Dry-run (parse + affiche le payload, ne pousse rien)
-DRY_RUN=1 CLAUDE_SESSION_TOKEN=x node scripts/sync-routines.mjs
+# Dry-run (valide la substitution + affiche le payload, ne pousse rien)
+DRY_RUN=1 node scripts/sync-routines.mjs
 
 # Forcer meme si le prompt est encore un placeholder TODO
-CLAUDE_SESSION_TOKEN=... node scripts/sync-routines.mjs --force
+node scripts/sync-routines.mjs --force
+
+# Sync SANS substituer les ${VAR} (debug : envoie les templates bruts)
+node scripts/sync-routines.mjs --keep-templates
 ```
 
-Le script est en ESM natif Node 20+ (aucune dep npm). Si le YAML a un `id`, il fait un
-UPDATE (PATCH) ; sinon il CREATE (POST) et reecrit l'id dans le YAML (a committer ensuite).
+Le script est en ESM natif Node 20+ (aucune dep npm). Il charge `.env` a la racine via
+un mini-parser integre (pas de `dotenv`). Si le YAML a un `id`, il fait un UPDATE
+(PATCH) ; sinon il CREATE (POST) et reecrit l'id dans le YAML (a committer ensuite).
 
 Via npm run :
 
@@ -408,6 +426,18 @@ les commandes locales ont priorite sur celles du plugin.
 ---
 
 ## Changelog
+
+### v0.6.1 — 2026-04-17 (security : prompts routines templates)
+
+**Patch bump** : securisation des 7 prompts routines avant publication du repo en public. Les tokens sensibles sont remplaces par des placeholders `${VAR}` substitues au push.
+
+**Securite**
+- chore(routines) : 7 prompts `prompts/*.md` reecrits en version **templates**. Zero token en clair. Placeholders utilises : `${TELEGRAM_PUSH_TOKEN}`, `${TELEGRAM_BOT_TOKEN}`, `${AGENT_MEMORY_TOKEN}`, `${TELEGRAM_CHAT_ID}`, `${CLICKUP_WORKSPACE_ID}`, `${CLICKUP_CHAT_CHANNEL}`.
+- feat(scripts) : `sync-routines.mjs` charge un `.env` local (parser integre, zero dep) et substitue les `${VAR}` avant push vers l'API RemoteTrigger. Refuse de push si une variable referencee est manquante (liste explicite des missing). Flag `--keep-templates` pour sync les prompts bruts (debug).
+- feat(env) : `.env.example` complete avec `TELEGRAM_PUSH_TOKEN`, `CLICKUP_CHAT_CHANNEL`, `CLAUDE_SESSION_TOKEN`.
+- docs(readme) : section routines clarifie le modele template + `.env` + substitution.
+
+**Compatibilite** : aucun breaking change. `node scripts/sync-routines.mjs` fonctionne comme avant, avec en plus le chargement auto du `.env` et la substitution.
 
 ### v0.6.0 — 2026-04-17 (routines scheduled trackees en git)
 
