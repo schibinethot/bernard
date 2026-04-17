@@ -73,7 +73,7 @@ coordination documentee. Namespace runtime : `bernard:<agent>` (ex `bernard:seba
 sur Fly.io par defaut. Permet aux agents de partager des decisions, des learnings et des
 etats de projet entre sessions.
 
-### 7 routines scheduled
+### 11 routines scheduled
 
 Routines Claude Code programmees qui tournent sur `claude.ai/code/scheduled`. Chaque routine
 est trackee en git via un fichier YAML (metadata + cron) + un fichier markdown (prompt),
@@ -88,6 +88,10 @@ et est redeployable en une commande via `scripts/sync-routines.mjs`.
 | `mika-daily-ads-perf` | `0 7 * * 1-5` | Perf ads Meta + Google Ads quotidienne sur Atelier Mesure |
 | `iris-weekly-projects-kpi` | `0 14 * * 5` | KPI des 4 projets critiques chaque vendredi 16h Paris |
 | `laure-weekly-seo` | `0 9 * * 2` | Veille SEO AM chaque mardi 11h Paris (positions, concurrence) |
+| `retro-nightly` | `0 23 * * *` | RETRO nocturne 01h Paris : scan logs 24h, PRs auto sur prompts bancals (Phase 5) |
+| `auto-test-weekly` | `0 3 * * 1` | ELENA clone + `npm test` des 4 repos chaque lundi 05h Paris, PR fix si trivial (Phase 5) |
+| `cross-scan-weekly` | `0 4 * * 1` | BERNARD cross-scan patterns inter-projets chaque lundi 06h Paris (SQL, try-catch, TODO, secrets) (Phase 5) |
+| `upgrade-agents-weekly` | `0 5 * * 0` | CLAIRE+NOVA veille releases Anthropic/Mistral/OpenAI chaque dimanche 07h Paris, PRs agents (Phase 5) |
 
 **Structure** :
 - `routines/<nom>.yml` — metadata (id trigger, cron, env, model, tools, MCP connections, reference prompt)

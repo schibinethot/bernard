@@ -1,0 +1,37 @@
+# Routine: cross-scan-weekly
+# BERNARD cross-scan patterns d'erreur inter-projets (SQL injection possibles, try-catch vides,
+# console.log oublies, TODO > 30j). Si pattern > 3 occurrences -> PR fix global par pattern.
+# Reutilise la logique du skill /cross-scan existant.
+# Cron: 0 4 * * 1 (04h UTC = 06h Paris, lundi)
+# Phase 5 Agents Platform v2 - ClickUp 869cy9wkc
+
+# Repos cibles (sources) :
+#   - https://github.com/schibinethot/NELVO-plateforme-sav
+#   - https://github.com/schibinethot/ERP-LM-Production
+#   - https://github.com/schibinethot/SITE-AtelierMesure
+#   - https://github.com/schibinethot/CRM-ESC-PACK
+
+id:
+name: cross-scan-weekly
+cron_expression: "0 4 * * 1"
+enabled: true
+environment_id: env_011CUrm8hehQsPNdcpzyF7wR
+model: claude-opus-4-7
+allowed_tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - WebSearch
+  - WebFetch
+mcp_connections:
+  - name: ClickUp
+    connector_uuid: 280e664c-a8bf-4d6b-b141-a406cde992df
+    url: https://mcp.clickup.com/mcp
+sources:
+  - https://github.com/schibinethot/NELVO-plateforme-sav
+  - https://github.com/schibinethot/ERP-LM-Production
+  - https://github.com/schibinethot/SITE-AtelierMesure
+  - https://github.com/schibinethot/CRM-ESC-PACK
+prompt_file: prompts/cross-scan-weekly.md

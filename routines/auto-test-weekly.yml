@@ -1,0 +1,37 @@
+# Routine: auto-test-weekly
+# ELENA auto-tests hebdomadaires sur les 4 repos Nelvo. Clone + npm test chaque repo, analyse
+# regressions, cree PR fix si cause triviale (dep update, typo), sinon tache ClickUp tag
+# 'elena-regression'.
+# Cron: 0 3 * * 1 (03h UTC = 05h Paris, lundi)
+# Phase 5 Agents Platform v2 - ClickUp 869cy9wkc
+
+# Repos cibles (sources) :
+#   - https://github.com/schibinethot/NELVO-plateforme-sav
+#   - https://github.com/schibinethot/ERP-LM-Production
+#   - https://github.com/schibinethot/SITE-AtelierMesure
+#   - https://github.com/schibinethot/CRM-ESC-PACK
+
+id:
+name: auto-test-weekly
+cron_expression: "0 3 * * 1"
+enabled: true
+environment_id: env_011CUrm8hehQsPNdcpzyF7wR
+model: claude-opus-4-7
+allowed_tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - WebSearch
+  - WebFetch
+mcp_connections:
+  - name: ClickUp
+    connector_uuid: 280e664c-a8bf-4d6b-b141-a406cde992df
+    url: https://mcp.clickup.com/mcp
+sources:
+  - https://github.com/schibinethot/NELVO-plateforme-sav
+  - https://github.com/schibinethot/ERP-LM-Production
+  - https://github.com/schibinethot/SITE-AtelierMesure
+  - https://github.com/schibinethot/CRM-ESC-PACK
+prompt_file: prompts/auto-test-weekly.md

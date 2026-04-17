@@ -1,0 +1,29 @@
+# Routine: retro-nightly
+# Retro nocturne auto-amelioration - scan logs MCP agent-memory des 24h, identifie patterns
+# bancals (doublons Telegram, timeouts agents, prompts fautifs), cree PRs de correction sur
+# les prompts/agents concernes si l'amelioration est claire.
+# Cron: 0 23 * * * (23h UTC = 01h Paris, tous les jours)
+# Phase 5 Agents Platform v2 - ClickUp 869cy9wkc
+
+id:
+name: retro-nightly
+cron_expression: "0 23 * * *"
+enabled: true
+environment_id: env_011CUrm8hehQsPNdcpzyF7wR
+model: claude-opus-4-7
+allowed_tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - WebSearch
+  - WebFetch
+mcp_connections:
+  - name: ClickUp
+    connector_uuid: 280e664c-a8bf-4d6b-b141-a406cde992df
+    url: https://mcp.clickup.com/mcp
+  - name: agent-memory
+    connector_uuid: null
+    url: https://agent-memory-mcp.fly.dev/mcp
+prompt_file: prompts/retro-nightly.md

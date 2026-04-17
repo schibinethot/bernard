@@ -1,0 +1,26 @@
+# Routine: upgrade-agents-weekly
+# CLAIRE + NOVA cherchent les nouvelles features Anthropic/Mistral/OpenAI de la semaine,
+# comparent avec la config actuelle des agents du plugin bernard, proposent des PRs sur
+# agents/*.md si gain clair. Push Telegram digest hebdo des tendances tooling.
+# Cron: 0 5 * * 0 (05h UTC = 07h Paris, dimanche)
+# Phase 5 Agents Platform v2 - ClickUp 869cy9wkc
+
+id:
+name: upgrade-agents-weekly
+cron_expression: "0 5 * * 0"
+enabled: true
+environment_id: env_011CUrm8hehQsPNdcpzyF7wR
+model: claude-sonnet-4-6
+allowed_tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - WebSearch
+  - WebFetch
+mcp_connections:
+  - name: ClickUp
+    connector_uuid: 280e664c-a8bf-4d6b-b141-a406cde992df
+    url: https://mcp.clickup.com/mcp
+prompt_file: prompts/upgrade-agents-weekly.md
