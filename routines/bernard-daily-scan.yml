@@ -1,0 +1,24 @@
+# Routine: bernard-daily-scan
+# Briefing matinal BERNARD - scan emails/agenda/ClickUp/memoires, prepare la journee.
+# Cron: 30 5 * * 1-5 (05h30 UTC = 07h30 Paris, lun-ven)
+
+id: trig_01XFd5u9nEB53DFvMcQFcZSF
+name: bernard-daily-scan
+cron_expression: "30 5 * * 1-5"
+enabled: true
+environment_id: env_011CUrm8hehQsPNdcpzyF7wR
+model: claude-opus-4-7
+allowed_tools:
+  - Bash
+  - Read
+  - Write
+  - WebSearch
+  - WebFetch
+mcp_connections:
+  - name: ClickUp
+    connector_uuid: 280e664c-a8bf-4d6b-b141-a406cde992df
+    url: https://mcp.clickup.com/mcp
+  - name: agent-memory
+    connector_uuid: null
+    url: https://agent-memory-mcp.fly.dev/mcp
+prompt_file: prompts/bernard-daily-scan.md

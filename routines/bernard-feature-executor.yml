@@ -1,0 +1,25 @@
+# Routine: bernard-feature-executor
+# Execution automatique des features approuvees (tag bernard-approved dans ClickUp).
+# Cron: 33 8 * * 1-5 (08h33 UTC = 10h33 Paris, lun-ven)
+
+id: trig_01GTjnKA3rFvXYVj5e7YTuWo
+name: bernard-feature-executor
+cron_expression: "33 8 * * 1-5"
+enabled: true
+environment_id: env_011CUrm8hehQsPNdcpzyF7wR
+model: claude-opus-4-7
+allowed_tools:
+  - Bash
+  - Read
+  - Write
+  - Edit
+  - WebSearch
+  - WebFetch
+mcp_connections:
+  - name: ClickUp
+    connector_uuid: 280e664c-a8bf-4d6b-b141-a406cde992df
+    url: https://mcp.clickup.com/mcp
+  - name: agent-memory
+    connector_uuid: null
+    url: https://agent-memory-mcp.fly.dev/mcp
+prompt_file: prompts/bernard-feature-executor.md

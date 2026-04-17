@@ -1,0 +1,24 @@
+# Routine: iris-weekly-projects-kpi
+# Rapport KPI hebdomadaire IRIS sur les 4 projets critiques (ERP-AM, SITE-AM, CRM-ESC-PACK, APP-NELVO).
+# Cron: 0 14 * * 5 (14h UTC = 16h Paris, vendredi)
+
+id: trig_01Md7gUGMAHFiHmv5WJnYTzs
+name: iris-weekly-projects-kpi
+cron_expression: "0 14 * * 5"
+enabled: true
+environment_id: env_011CUrm8hehQsPNdcpzyF7wR
+model: claude-opus-4-7
+allowed_tools:
+  - Bash
+  - Read
+  - Write
+  - WebSearch
+  - WebFetch
+mcp_connections:
+  - name: ClickUp
+    connector_uuid: 280e664c-a8bf-4d6b-b141-a406cde992df
+    url: https://mcp.clickup.com/mcp
+  - name: agent-memory
+    connector_uuid: null
+    url: https://agent-memory-mcp.fly.dev/mcp
+prompt_file: prompts/iris-weekly-projects-kpi.md

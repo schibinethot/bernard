@@ -73,6 +73,55 @@ coordination documentee. Namespace runtime : `bernard:<agent>` (ex `bernard:seba
 sur Fly.io par defaut. Permet aux agents de partager des decisions, des learnings et des
 etats de projet entre sessions.
 
+### 7 routines scheduled
+
+Routines Claude Code programmees qui tournent sur `claude.ai/code/scheduled`. Chaque routine
+est trackee en git via un fichier YAML (metadata + cron) + un fichier markdown (prompt),
+et est redeployable en une commande via `scripts/sync-routines.mjs`.
+
+| Routine | Cron | Role |
+|---|---|---|
+| `bernard-daily-scan` | `30 5 * * 1-5` | Briefing matinal lun-ven 07h30 Paris (emails, agenda, ClickUp, memoires) |
+| `bernard-feature-executor` | `33 8 * * 1-5` | Execution auto des features taguees `bernard-approved` |
+| `bernard-weekly-security` | `17 6 * * 1` | Audit securite CASEY chaque lundi 08h17 Paris (CVE, OWASP) |
+| `nova-synthesis-3x-daily` | `0 7,12,17 * * *` | Veille AI tooling NOVA 3x/jour (09h/14h/19h Paris) |
+| `mika-daily-ads-perf` | `0 7 * * 1-5` | Perf ads Meta + Google Ads quotidienne sur Atelier Mesure |
+| `iris-weekly-projects-kpi` | `0 14 * * 5` | KPI des 4 projets critiques chaque vendredi 16h Paris |
+| `laure-weekly-seo` | `0 9 * * 2` | Veille SEO AM chaque mardi 11h Paris (positions, concurrence) |
+
+**Structure** :
+- `routines/<nom>.yml` — metadata (id trigger, cron, env, model, tools, MCP connections, reference prompt)
+- `prompts/<nom>.md` — prompt complet de la routine (separe du YAML pour rester lisible)
+
+**Sync vers claude.ai** :
+
+```bash
+# Recuperer le session token :
+#   claude.ai > DevTools > Application > Cookies > sessionKey (sk-ant-sid01-...)
+
+# Sync une seule routine (filtre sur le nom)
+CLAUDE_SESSION_TOKEN=sk-ant-sid01-... node scripts/sync-routines.mjs nova
+
+# Sync toutes les routines
+CLAUDE_SESSION_TOKEN=sk-ant-sid01-... node scripts/sync-routines.mjs
+
+# Dry-run (parse + affiche le payload, ne pousse rien)
+DRY_RUN=1 CLAUDE_SESSION_TOKEN=x node scripts/sync-routines.mjs
+
+# Forcer meme si le prompt est encore un placeholder TODO
+CLAUDE_SESSION_TOKEN=... node scripts/sync-routines.mjs --force
+```
+
+Le script est en ESM natif Node 20+ (aucune dep npm). Si le YAML a un `id`, il fait un
+UPDATE (PATCH) ; sinon il CREATE (POST) et reecrit l'id dans le YAML (a committer ensuite).
+
+Via npm run :
+
+```bash
+npm run sync-routines:dry       # dry-run
+npm run sync-routines -- nova   # cible une routine
+```
+
 ---
 
 ## Installation
@@ -225,7 +274,7 @@ bernard/                   # name dans plugin.json ; repo = schibinethot/bernard
     marketplace.json       # wrapper marketplace pour distribution /plugin marketplace add
   agents/                  # 18 agents (.md avec frontmatter)
   commands/                # 7 commandes workflow
-  skills/                  # 10 skills autonomes
+  skills/                  # 12 skills autonomes
     audit-project/SKILL.md
     audit-crm/SKILL.md
     simplify/SKILL.md
@@ -236,6 +285,8 @@ bernard/                   # name dans plugin.json ; repo = schibinethot/bernard
     am-promote-branch-sync/SKILL.md
     email-cron-create/SKILL.md
     am-social-postproxy-publish/SKILL.md
+    social-caption-generate/SKILL.md
+    cost-tracker/SKILL.md
   hooks/
     hooks.json             # config events
     scripts/
@@ -246,8 +297,28 @@ bernard/                   # name dans plugin.json ; repo = schibinethot/bernard
       elena-casey-enforcer.sh
       stop-auto-memory.sh
       memory-hygiene.sh
+      cron-date-filter-check.sh
+  routines/                # 7 routines scheduled (YAML metadata)
+    bernard-daily-scan.yml
+    bernard-feature-executor.yml
+    bernard-weekly-security.yml
+    nova-synthesis-3x-daily.yml
+    mika-daily-ads-perf.yml
+    iris-weekly-projects-kpi.yml
+    laure-weekly-seo.yml
+  prompts/                 # 7 prompts des routines (separes pour lisibilite)
+    bernard-daily-scan.md
+    bernard-feature-executor.md
+    bernard-weekly-security.md
+    nova-synthesis-3x-daily.md
+    mika-daily-ads-perf.md
+    iris-weekly-projects-kpi.md
+    laure-weekly-seo.md
+  scripts/
+    sync-routines.mjs      # CLI sync routines -> claude.ai/code/scheduled (Node 20+, zero dep)
   .mcp.json                # config MCP agent-memory
   .env.example
+  package.json             # scripts npm run sync-routines
   LICENSE
   README.md
   docs/                    # guides, patterns, screenshots
@@ -329,13 +400,33 @@ les commandes locales ont priorite sur celles du plugin.
 - [x] v0.3 — Command `/bernard-worktree-split` + 3 skills P1 (`am-promote-branch-sync`, `email-cron-create`, `am-social-postproxy-publish`) + 2 hooks (`worktree-gitignore-check`, `branch-sync-reminder`)
 - [x] v0.4 — Skill `social-caption-generate` + hook `cron-date-filter-check`
 - [x] v0.5 — Skill `cost-tracker` (suivi cout LLM par agent)
-- [ ] v0.6 — Commandes `/focus`, `/digest`, `/speculate` (cockpit quotidien)
-- [ ] v0.7 — Templates projets (web SaaS, mobile, e-commerce)
+- [x] v0.6 — 7 routines scheduled trackees en git + CLI `sync-routines.mjs` (Phase 3 Agents Platform v2)
+- [ ] v0.7 — Commandes `/focus`, `/digest`, `/speculate` (cockpit quotidien)
+- [ ] v0.8 — Templates projets (web SaaS, mobile, e-commerce)
 - [ ] v1.0 — Dashboard web de gouvernance des agents
 
 ---
 
 ## Changelog
+
+### v0.6.0 — 2026-04-17 (routines scheduled trackees en git)
+
+**Minor bump** : tracking des 7 routines Claude Code scheduled en git + CLI de sync idempotente. Phase 3 Agents Platform v2.
+
+**Nouveautes**
+- feat(routines) : 7 fichiers YAML dans `routines/` (metadata : id trigger, cron, env, model, tools, MCP connections) + 7 fichiers markdown dans `prompts/` (prompts separes du YAML pour lisibilite). Routines trackees : `bernard-daily-scan`, `bernard-feature-executor`, `bernard-weekly-security`, `nova-synthesis-3x-daily`, `mika-daily-ads-perf`, `iris-weekly-projects-kpi`, `laure-weekly-seo`.
+- feat(scripts) : `scripts/sync-routines.mjs` — CLI Node ESM (Node 20+ natif, zero dep npm) qui lit les YAML + prompts, push vers `claude.ai/api/triggers` (CREATE si pas d'id, UPDATE sinon). Garde placeholder TODO. Options `--force`, `DRY_RUN=1`, filtre par nom.
+- feat(npm) : `package.json` a la racine avec `npm run sync-routines` / `npm run sync-routines:dry`.
+- docs(readme) : nouvelle section "7 routines scheduled" avec table recap + guide d'usage. Section architecture mise a jour. Changelog + roadmap.
+
+**Note** : les prompts dans `prompts/*.md` sont actuellement des placeholders TODO. Le script refuse de push tant que le placeholder n'est pas remplace (sauf `--force`). Les prompts exacts des 7 routines existantes doivent etre copies depuis `claude.ai/code/scheduled` manuellement.
+
+**Compteurs**
+- Commandes : 7 (inchange)
+- Skills : 12 (inchange)
+- Hooks : 8 (inchange)
+- Agents : 18 (inchange)
+- Routines : 0 -> 7 (+7)
 
 ### v0.5.0 — 2026-04-16 (cost tracking)
 

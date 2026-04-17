@@ -1,0 +1,23 @@
+# Routine: bernard-weekly-security
+# Audit securite hebdomadaire CASEY - CVE, dependances, OWASP top 10.
+# Cron: 17 6 * * 1 (06h17 UTC = 08h17 Paris, lundi)
+
+id: trig_01GYMeHSChyM8abDVhoLmXFp
+name: bernard-weekly-security
+cron_expression: "17 6 * * 1"
+enabled: true
+environment_id: env_011CUrm8hehQsPNdcpzyF7wR
+model: claude-opus-4-7
+allowed_tools:
+  - Bash
+  - Read
+  - WebSearch
+  - WebFetch
+mcp_connections:
+  - name: ClickUp
+    connector_uuid: 280e664c-a8bf-4d6b-b141-a406cde992df
+    url: https://mcp.clickup.com/mcp
+  - name: agent-memory
+    connector_uuid: null
+    url: https://agent-memory-mcp.fly.dev/mcp
+prompt_file: prompts/bernard-weekly-security.md

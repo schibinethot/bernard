@@ -1,0 +1,24 @@
+# Routine: mika-daily-ads-perf
+# Perf ads quotidiennes Atelier Mesure (Meta + Google Ads).
+# Cron: 0 7 * * 1-5 (07h UTC = 09h Paris, lun-ven)
+
+id: trig_01V2o3h8RGS4Tyyr9b88FwLK
+name: mika-daily-ads-perf
+cron_expression: "0 7 * * 1-5"
+enabled: true
+environment_id: env_011CUrm8hehQsPNdcpzyF7wR
+model: claude-opus-4-7
+allowed_tools:
+  - Bash
+  - Read
+  - Write
+  - WebSearch
+  - WebFetch
+mcp_connections:
+  - name: ClickUp
+    connector_uuid: 280e664c-a8bf-4d6b-b141-a406cde992df
+    url: https://mcp.clickup.com/mcp
+  - name: agent-memory
+    connector_uuid: null
+    url: https://agent-memory-mcp.fly.dev/mcp
+prompt_file: prompts/mika-daily-ads-perf.md

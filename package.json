@@ -1,0 +1,19 @@
+{
+  "name": "bernard-cc-plugin",
+  "version": "0.6.0",
+  "description": "BERNARD Claude Code plugin - CLI scripts (routines sync, etc.)",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "sync-routines": "node scripts/sync-routines.mjs",
+    "sync-routines:dry": "DRY_RUN=1 node scripts/sync-routines.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/schibinethot/bernard.git"
+  },
+  "license": "SEE LICENSE IN LICENSE"
+}

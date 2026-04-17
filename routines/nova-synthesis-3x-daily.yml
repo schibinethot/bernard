@@ -1,0 +1,24 @@
+# Routine: nova-synthesis-3x-daily
+# Veille AI tooling NOVA 3x/jour (releases, combos, migrations).
+# Cron: 0 7,12,17 * * * (07h/12h/17h UTC = 09h/14h/19h Paris, tous les jours)
+
+id: trig_01NXnhggowveAHgosVk5apo8
+name: nova-synthesis-3x-daily
+cron_expression: "0 7,12,17 * * *"
+enabled: true
+environment_id: env_011CUrm8hehQsPNdcpzyF7wR
+model: claude-sonnet-4-6
+allowed_tools:
+  - Bash
+  - Read
+  - Write
+  - WebSearch
+  - WebFetch
+mcp_connections:
+  - name: ClickUp
+    connector_uuid: 280e664c-a8bf-4d6b-b141-a406cde992df
+    url: https://mcp.clickup.com/mcp
+  - name: agent-memory
+    connector_uuid: null
+    url: https://agent-memory-mcp.fly.dev/mcp
+prompt_file: prompts/nova-synthesis-3x-daily.md
