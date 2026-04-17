@@ -62,6 +62,19 @@ if echo "$COMMAND" | grep -qiE "(psql|execute_sql|supabase sql)"; then
       exit 2
     fi
   done
+  # DELETE FROM sans WHERE = catastrophe. Pattern : "DELETE FROM <table>" sans "WHERE" apres.
+  if echo "$COMMAND" | grep -qiE "DELETE[[:space:]]+FROM[[:space:]]+[a-zA-Z_][a-zA-Z0-9_\.]*([[:space:]]*;|[[:space:]]*\")"; then
+    if ! echo "$COMMAND" | grep -qiE "WHERE"; then
+      echo "[bernard-guard] SQL dangereux : DELETE FROM sans WHERE (suppression totale). Ajoute WHERE <condition>." >&2
+      exit 2
+    fi
+  fi
+fi
+
+# git push --force main/master (meme avec slashes ou refs)
+if echo "$BASE_CMD" | grep -qiE "git push.*(--force|-f)[[:space:]].*(main|master)([[:space:]]|$|:)"; then
+  echo "[bernard-guard] Commande dangereuse : git push --force vers main/master. Reformule (PR + merge)." >&2
+  exit 2
 fi
 
 exit 0

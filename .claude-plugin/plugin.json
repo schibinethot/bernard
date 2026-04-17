@@ -1,7 +1,7 @@
 {
   "name": "bernard",
-  "version": "0.6.0",
-  "description": "BERNARD as a Service — Orchestrateur Claude Code + 18 agents specialises (1 orchestrateur + 17 experts : tech, produit, design, ops, finance, legal, secu, data, AI tooling) + commandes workflow + skills d'audit et de deploy AM + hooks de garde (guard, enforcer ELENA/CASEY, memory-hygiene) + 7 routines scheduled (daily scan, feature executor, weekly security, NOVA veille, MIKA ads, IRIS KPI, LAURE SEO) + MCP agent-memory",
+  "version": "0.7.0",
+  "description": "BERNARD as a Service — Orchestrateur Claude Code + 18 agents specialises (1 orchestrateur + 17 experts : tech, produit, design, ops, finance, legal, secu, data, AI tooling) + commandes workflow + skills d'audit et de deploy AM + hooks avances (guard elargi DELETE/push-force, ELENA/CASEY, memory-hygiene, bash-audit-log, pre-compact-snapshot, session-end-summary) + 7 routines scheduled (daily scan, feature executor, weekly security, NOVA veille, MIKA ads, IRIS KPI, LAURE SEO) + MCP agent-memory",
   "author": {
     "name": "BERNARD — Atelier Tpmge",
     "email": "hello@bernard.as",
