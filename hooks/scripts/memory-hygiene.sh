@@ -35,39 +35,33 @@ if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
   exit 0
 fi
 
-BERNARD_COUNT=$(python3 - "$TRANSCRIPT_PATH" <<'PY' 2>/dev/null
+BERNARD_COUNT=$(set +o pipefail; tail -c 4194304 "$TRANSCRIPT_PATH" 2>/dev/null \
+  | grep -F "store_memory" 2>/dev/null \
+  | python3 - <<'PY' 2>/dev/null || true
 import sys, json
-path = sys.argv[1]
 count = 0
-try:
-    with open(path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                row = json.loads(line)
-            except Exception:
-                continue
-            stack = [row]
-            while stack:
-                node = stack.pop()
-                if isinstance(node, dict):
-                    name = node.get("name") or node.get("tool_name") or ""
-                    if isinstance(name, str) and "store_memory" in name:
-                        inp = node.get("input") or node.get("tool_input") or {}
-                        agent = ""
-                        if isinstance(inp, dict):
-                            agent = str(inp.get("agent", "")).lower()
-                        if agent == "bernard":
-                            count += 1
-                    for v in node.values():
-                        if isinstance(v, (dict, list)):
-                            stack.append(v)
-                elif isinstance(node, list):
-                    stack.extend(node)
-except Exception:
-    pass
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    try:
+        row = json.loads(line)
+    except Exception:
+        continue
+    stack = [row]
+    while stack:
+        node = stack.pop()
+        if isinstance(node, dict):
+            name = node.get("name") or node.get("tool_name") or ""
+            if isinstance(name, str) and "store_memory" in name:
+                inp = node.get("input") or node.get("tool_input") or {}
+                if isinstance(inp, dict) and str(inp.get("agent", "")).lower() == "bernard":
+                    count += 1
+            for v in node.values():
+                if isinstance(v, (dict, list)):
+                    stack.append(v)
+        elif isinstance(node, list):
+            stack.extend(node)
 print(count)
 PY
 )

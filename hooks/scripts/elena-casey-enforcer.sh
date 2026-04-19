@@ -55,38 +55,40 @@ ELENA_SEEN=0
 CASEY_SEEN=0
 
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
-  FLAGS=$(python3 - "$TRANSCRIPT_PATH" <<'PY' 2>/dev/null
+  # Scan bounded: last 2 MB only (fast even on 20MB+ transcripts).
+  # Grep-based prefilter avoids JSON parse on irrelevant lines.
+  # `|| true` pour absorber les SIGPIPE (python peut break early).
+  FLAGS=$(set +o pipefail; tail -c 2097152 "$TRANSCRIPT_PATH" 2>/dev/null \
+    | grep -iE "elena|casey" 2>/dev/null \
+    | python3 - <<'PY' 2>/dev/null || true
 import sys, json
-path = sys.argv[1]
 seen = {"elena": False, "casey": False}
-try:
-    with open(path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                row = json.loads(line)
-            except Exception:
-                continue
-            stack = [row]
-            while stack:
-                node = stack.pop()
-                if isinstance(node, dict):
-                    st = node.get("subagent_type") or node.get("agent") or ""
-                    if isinstance(st, str):
-                        s = st.lower()
-                        if "elena" in s:
-                            seen["elena"] = True
-                        if "casey" in s:
-                            seen["casey"] = True
-                    for v in node.values():
-                        if isinstance(v, (dict, list)):
-                            stack.append(v)
-                elif isinstance(node, list):
-                    stack.extend(node)
-except Exception:
-    pass
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    try:
+        row = json.loads(line)
+    except Exception:
+        continue
+    stack = [row]
+    while stack:
+        node = stack.pop()
+        if isinstance(node, dict):
+            st = node.get("subagent_type") or node.get("agent") or ""
+            if isinstance(st, str):
+                s = st.lower()
+                if "elena" in s:
+                    seen["elena"] = True
+                if "casey" in s:
+                    seen["casey"] = True
+            for v in node.values():
+                if isinstance(v, (dict, list)):
+                    stack.append(v)
+        elif isinstance(node, list):
+            stack.extend(node)
+    if seen["elena"] and seen["casey"]:
+        break
 print(("1" if seen["elena"] else "0") + ("1" if seen["casey"] else "0"))
 PY
 )

@@ -16,8 +16,20 @@ EXT="${FILE_PATH##*.}"
 
 case "$EXT" in
   ts|tsx|js|jsx|mjs|cjs)
-    if command -v npx >/dev/null 2>&1; then
-      npx --no-install eslint --fix "$FILE_PATH" 2>/dev/null || true
+    # Skip si pas de package.json pres du fichier (evite le cout d'un npx
+    # resolve hors projet Node).
+    DIR="$(dirname "$FILE_PATH")"
+    FOUND_PKG=""
+    while [ "$DIR" != "/" ] && [ "$DIR" != "." ] && [ -n "$DIR" ]; do
+      if [ -f "$DIR/package.json" ]; then
+        FOUND_PKG="$DIR"
+        break
+      fi
+      DIR="$(dirname "$DIR")"
+    done
+    if [ -n "$FOUND_PKG" ] && command -v npx >/dev/null 2>&1; then
+      # timeout 8s max pour eviter de geler le turn Claude
+      ( cd "$FOUND_PKG" && timeout 8 npx --no-install eslint --fix "$FILE_PATH" ) 2>/dev/null || true
     fi
     ;;
   *)
