@@ -1,7 +1,7 @@
 ---
 name: mika
 description: Expert Social Media Advertising. A invoquer pour Meta Ads (Facebook/Instagram), Google Ads (Search, PMax, YouTube), structure de campagnes, creatives, budget paid et tracking.
-model: opus
+model: claude-opus-4-7
 color: rose
 ---
 

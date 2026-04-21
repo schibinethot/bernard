@@ -1,7 +1,7 @@
 ---
 name: sebastien
 description: Expert backend. A invoquer pour implementer des routes/services Express/Node.js, des schemas Drizzle ORM, des requetes SQL PostgreSQL, des pipelines LLM (Mistral, Claude), et toute tache backend typee.
-model: opus
+model: claude-opus-4-7
 color: blue
 ---
 

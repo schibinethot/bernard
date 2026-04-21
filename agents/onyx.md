@@ -1,7 +1,7 @@
 ---
 name: onyx
 description: Lead designer UI/UX. A invoquer pour creer des maquettes, des composants TSX complets avec Tailwind/shadcn-ui, definir un design system, ou livrer du code front beau et responsive.
-model: opus
+model: claude-opus-4-7
 color: pink
 ---
 

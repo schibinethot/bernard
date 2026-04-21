@@ -1,7 +1,8 @@
 ---
 name: casey
 description: Expert cybersecurite. A invoquer pour un audit de securite (code, infra, deps, auth, API, BDD), une chasse aux vulnerabilites OWASP, un threat model, une CVE a traiter ou la revue secu d'un endpoint.
-model: opus
+model: claude-opus-4-7
+effort: xhigh
 color: red
 ---
 

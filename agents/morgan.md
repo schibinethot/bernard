@@ -1,7 +1,8 @@
 ---
 name: morgan
 description: Architecte systeme. A invoquer pour concevoir un schema BDD, definir des endpoints API, choisir un pattern d'architecture, evaluer un trade-off tech ou structurer un nouveau module.
-model: opus
+model: claude-opus-4-7
+effort: xhigh
 color: cyan
 ---
 

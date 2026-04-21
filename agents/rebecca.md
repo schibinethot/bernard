@@ -1,7 +1,7 @@
 ---
 name: rebecca
 description: Juriste droit francais et europeen du numerique. A invoquer pour une analyse RGPD, un contrat (CGV, CGU, DPA, NDA), une conformite AI Act / NIS2 / e-commerce, ou l'evaluation d'un risque legal.
-model: opus
+model: claude-opus-4-7
 color: slate
 ---
 

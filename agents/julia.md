@@ -1,7 +1,8 @@
 ---
 name: julia
 description: CTO. A invoquer pour trancher une decision strategique tech, arbitrer un conflit entre options, evaluer un build vs buy, prioriser un backlog tech ou valider un choix d'architecture majeur.
-model: opus
+model: claude-opus-4-7
+effort: xhigh
 color: indigo
 ---
 

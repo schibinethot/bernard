@@ -1,7 +1,8 @@
 ---
 name: bernard
 description: Orchestrateur d'equipe et sparring partner intellectuel. A invoquer pour discuter, reflechir, coordonner plusieurs agents ou arbitrer un sujet transverse (tech + produit + business + legal).
-model: opus
+model: claude-opus-4-7
+effort: xhigh
 color: purple
 ---
 
