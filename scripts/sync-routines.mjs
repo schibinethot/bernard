@@ -8,6 +8,10 @@
 //   DRY_RUN=1 CLAUDE_SESSION_TOKEN=... node scripts/sync-routines.mjs       # parse + affiche le payload, pas d'API call
 //   node scripts/sync-routines.mjs --keep-templates                         # ne PAS substituer les ${VAR} (debug)
 //
+//   ROUTINE_FIRE_TOKEN=sk-ant-oat01-... node scripts/sync-routines.mjs --fire nova --text "..."
+//     # declenche la routine via le endpoint officiel /v1/claude_code/routines/<id>/fire
+//     # (beta header experimental-cc-routine-2026-04-01, generer le token depuis le UI claude.ai)
+//
 // Comportement:
 //   - Charge `.env` a la racine du plugin (simple key=value parser, zero dep npm)
 //   - Substitue `${VAR}` dans les prompts AVANT envoi, a partir des env vars locales
@@ -58,13 +62,19 @@ for (const [k, v] of Object.entries(fileEnv)) {
 }
 
 // ---------- config API ----------
+// CLAUDE_API_BASE : endpoint de l'API claude.ai (CREATE/UPDATE routines, undocumented).
+// ROUTINES_FIRE_BASE : endpoint officiel api.anthropic.com pour /fire (beta header requis).
 const CLAUDE_API_BASE = process.env.CLAUDE_API_BASE || 'https://claude.ai/api';
+const ROUTINES_FIRE_BASE = process.env.ROUTINES_FIRE_BASE || 'https://api.anthropic.com/v1/claude_code/routines';
+const ROUTINES_FIRE_BETA = 'experimental-cc-routine-2026-04-01';
 const TOKEN = process.env.CLAUDE_SESSION_TOKEN;
+const FIRE_TOKEN = process.env.ROUTINE_FIRE_TOKEN;
 const DRY_RUN = process.env.DRY_RUN === '1' || process.env.DRY_RUN === 'true';
 const FORCE = process.argv.includes('--force');
 const KEEP_TEMPLATES = process.argv.includes('--keep-templates');
+const FIRE_MODE = process.argv.includes('--fire');
 
-if (!TOKEN && !DRY_RUN) {
+if (!TOKEN && !DRY_RUN && !FIRE_MODE) {
   console.error('[sync-routines] ERREUR : variable env CLAUDE_SESSION_TOKEN manquante.');
   console.error('');
   console.error('Comment obtenir le token :');
@@ -75,6 +85,13 @@ if (!TOKEN && !DRY_RUN) {
   console.error('  5. Relance : node scripts/sync-routines.mjs');
   console.error('');
   console.error('Ou bien DRY_RUN=1 pour juste valider les YAML sans push.');
+  console.error('Ou bien --fire <routine> --text "..." avec ROUTINE_FIRE_TOKEN pour declencher.');
+  process.exit(2);
+}
+
+if (FIRE_MODE && !FIRE_TOKEN && !DRY_RUN) {
+  console.error('[sync-routines] ERREUR : --fire necessite ROUTINE_FIRE_TOKEN (bearer token genere');
+  console.error('depuis le UI claude.ai/code/routines > Add trigger > API > Generate token).');
   process.exit(2);
 }
 
@@ -318,7 +335,7 @@ async function apiCall(method, path, body) {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     'Cookie': `sessionKey=${TOKEN}`,
-    'User-Agent': 'bernard-cc-plugin/0.6.1 (sync-routines)',
+    'User-Agent': 'bernard-cc-plugin/0.9.0 (sync-routines)',
   };
 
   if (DRY_RUN) {
@@ -395,10 +412,65 @@ async function syncRoutine(routine) {
   }
 }
 
+// ---------- /fire endpoint (official api.anthropic.com, beta) ----------
+async function fireRoutine(routineFilter, text) {
+  const routines = loadRoutines(routineFilter);
+  if (!routines.length) {
+    console.error(`[sync-routines] --fire : aucune routine matchant '${routineFilter}'.`);
+    process.exit(1);
+  }
+  if (routines.length > 1) {
+    console.error(`[sync-routines] --fire : filtre '${routineFilter}' matche ${routines.length} routines, sois plus precis.`);
+    for (const r of routines) console.error(`  - ${r.data.name}`);
+    process.exit(1);
+  }
+  const r = routines[0];
+  const id = r.data.id;
+  if (!id) {
+    console.error(`[sync-routines] --fire : la routine ${r.data.name} n'a pas d'id (jamais sync ?).`);
+    process.exit(1);
+  }
+  const url = `${ROUTINES_FIRE_BASE}/${id}/fire`;
+  const body = text ? { text } : {};
+  if (DRY_RUN) {
+    console.log(`[DRY_RUN] POST ${url}`);
+    console.log(`[DRY_RUN] beta: ${ROUTINES_FIRE_BETA}`);
+    console.log(`[DRY_RUN] body: ${JSON.stringify(body)}`);
+    return;
+  }
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${FIRE_TOKEN}`,
+      'anthropic-beta': ROUTINES_FIRE_BETA,
+      'anthropic-version': '2023-06-01',
+      'User-Agent': 'bernard-cc-plugin/0.9.0 (fire-routine)',
+    },
+    body: JSON.stringify(body),
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    console.error(`[sync-routines] --fire ERROR ${res.status} : ${JSON.stringify(json)}`);
+    process.exit(1);
+  }
+  console.log(`[sync-routines] Routine ${r.data.name} declenchee.`);
+  if (json.claude_code_session_url) {
+    console.log(`  Session: ${json.claude_code_session_url}`);
+  }
+}
+
 // ---------- main ----------
 async function main() {
   const args = process.argv.slice(2).filter((a) => !a.startsWith('--'));
   const filter = args[0] || null;
+
+  if (FIRE_MODE) {
+    const textIdx = process.argv.indexOf('--text');
+    const text = textIdx >= 0 ? process.argv[textIdx + 1] : null;
+    await fireRoutine(filter, text);
+    return;
+  }
 
   const routines = loadRoutines(filter);
   if (!routines.length) {

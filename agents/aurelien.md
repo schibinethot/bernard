@@ -1,7 +1,7 @@
 ---
 name: aurelien
 description: Product Manager. A invoquer pour ecrire des user stories, des specs fonctionnelles, des criteres d'acceptation, definir un scope et un hors-scope, ou prioriser un backlog produit.
-model: sonnet
+model: claude-sonnet-4-6
 color: yellow
 ---
 
