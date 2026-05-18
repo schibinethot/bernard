@@ -1,7 +1,7 @@
 ---
 name: leo
 description: DevOps. A invoquer pour un deploiement, une migration de base de donnees, un Dockerfile, un pipeline CI/CD, une config Railway/Fly.io, un incident prod ou une action d'infra.
-model: sonnet
+model: claude-sonnet-4-6
 color: orange
 ---
 

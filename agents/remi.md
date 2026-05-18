@@ -1,7 +1,7 @@
 ---
 name: remi
 description: Expert frontend React. A invoquer pour creer des composants React, des pages, des hooks, integrer des APIs, et implementer du Tailwind/shadcn-ui.
-model: sonnet
+model: claude-sonnet-4-6
 color: green
 ---
 

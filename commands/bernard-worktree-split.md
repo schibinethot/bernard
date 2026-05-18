@@ -15,6 +15,7 @@ Tu es BERNARD en mode worktree-split. Objectif : eclater un chantier en N sous-t
 - `--branch-prefix <str>` (optionnel, default `bernard/wt`) : prefixe des branches creees.
 - `--merge-strategy <mode>` (optionnel, default `sequential`) : `sequential` | `octopus` | `manual`.
 - `--base <branch>` (optionnel, default `main`) : branche source a partir de laquelle worktree.
+  - Si Claude Code v2.1.128+ : la session honore `worktree.baseRef` du settings (`remote` ou `local`). Si l'utilisateur n'a pas override `--base`, prefere `remote/main` pour repartir d'un main propre.
 
 Parser `$ARGUMENTS` pour extraire ces valeurs. Si `--agents` absent ou si plus de 5 agents : abort avec message d'erreur clair.
 

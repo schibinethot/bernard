@@ -2,7 +2,7 @@
 
 **BERNARD as a Service** — Plugin Claude Code qui transforme votre CLI en une equipe complete :
 un orchestrateur BERNARD + 17 experts specialises (18 agents au total), 7 commandes workflow,
-12 skills, 8 hooks de garde et un MCP de memoire partagee.
+12 skills, 11 hooks de garde, 11 routines scheduled et un MCP de memoire partagee.
 
 > Licence commerciale. 30 jours d'evaluation gratuite. Voir [LICENSE](./LICENSE).
 
@@ -54,18 +54,21 @@ coordination documentee. Namespace runtime : `bernard:<agent>` (ex `bernard:seba
 | `social-caption-generate` | Generer captions Instagram/Facebook/LinkedIn conformes aux regles AM |
 | `cost-tracker` | Analyse et estime les couts LLM par agent, modele et projet via MCP agent-memory |
 
-### 8 hooks de garde
+### 11 hooks de garde
 
 | Event | Script | Role |
 |---|---|---|
-| `PreToolUse` (Bash) | `guard.sh` | Bloque git force-push, rm -rf /, SQL destructeur |
+| `PreToolUse` (Bash) | `guard.sh` | Bloque git force-push, rm -rf /, SQL destructeur (DROP/TRUNCATE/DELETE sans WHERE) |
 | `PreToolUse` (Bash) | `worktree-gitignore-check.sh` | Bloque `git add .worktrees/` et `git add .` si .worktrees absent de .gitignore |
 | `PostToolUse` (Write/Edit) | `post-write-lint.sh` | Lance `eslint --fix` sur les TS/JS |
-| `PostToolUse` (Bash) | `branch-sync-reminder.sh` | Rappelle skill am-promote-branch-sync apres push origin main sur projet critique |
-| `SubagentStop` | `elena-casey-enforcer.sh` | Rappelle ELENA + CASEY apres SEBASTIEN/REMI/MORGAN sur projet critique |
-| `SessionEnd` | `stop-auto-memory.sh` | Demande a Claude de memoriser les learnings |
 | `PostToolUse` (Write/Edit) | `cron-date-filter-check.sh` | Detecte crons sans filtre date anti-backfill |
+| `PostToolUse` (Bash) | `branch-sync-reminder.sh` | Rappelle skill am-promote-branch-sync apres push origin main sur projet critique |
+| `PostToolUse` (Bash) | `bash-audit-log.sh` | Log Bash dans MCP agent-memory (audit Phase 5 + patterns d'erreur sur crons) |
+| `SubagentStop` | `elena-casey-enforcer.sh` | Rappelle ELENA + CASEY apres SEBASTIEN/REMI/MORGAN sur projet critique |
+| `PreCompact` | `pre-compact-snapshot.sh` | Avant compaction : nudge `store_memory` sur decisions critiques (effort-aware) |
+| `SessionEnd` | `stop-auto-memory.sh` | Demande a Claude de memoriser les learnings |
 | `SessionEnd` | `memory-hygiene.sh` | Warn si BERNARD depasse 5 memories/session |
+| `SessionEnd` | `session-end-summary.sh` | Push direct vers MCP agent-memory (garantit au moins 1 trace audit) |
 
 ### 1 serveur MCP
 
@@ -150,11 +153,11 @@ npm run sync-routines -- nova   # cible une routine
 
 ### 1. Pre-requis
 
-- Claude Code >= 2.1 (support plugins)
+- **Claude Code >= 2.1.105** (Opus 4.7 + Routines + skills frontmatter `context: fork` + hooks dans frontmatter agents/skills + `effort: xhigh` + auto mode hard_deny + native binaries)
 - Un endpoint MCP agent-memory (URL + bearer token) — voir `.env.example`
 - Optionnel : `gws` CLI (Google Workspace), MCP ClickUp
 
-Doc officielle plugins Claude Code : https://docs.claude.com/en/docs/claude-code/plugins
+Doc officielle plugins Claude Code : https://code.claude.com/docs/en/plugins
 
 ### 2. Installer le plugin
 
@@ -208,6 +211,20 @@ Clone le repo, puis declare le plugin dans votre config user Claude Code :
 
 Le plugin sera charge automatiquement a chaque session Claude Code, sans passer par
 le systeme de marketplace.
+
+#### Option D — `--plugin-url` ou `--plugin-dir` (session-scoped, v2.1.128+)
+
+Pour tester une version specifique sans installer globalement :
+
+```bash
+# Telecharge un tarball/zip du plugin pour la session courante
+claude --plugin-url https://github.com/schibinethot/bernard/archive/refs/heads/main.zip
+
+# Ou pointer un dossier local
+claude --plugin-dir /absolute/path/to/bernard
+```
+
+Pratique pour tester une branche de feature avant de merger sur main.
 
 ### 3. Configurer les secrets
 
@@ -423,13 +440,59 @@ les commandes locales ont priorite sur celles du plugin.
 - [x] v0.4 — Skill `social-caption-generate` + hook `cron-date-filter-check`
 - [x] v0.5 — Skill `cost-tracker` (suivi cout LLM par agent)
 - [x] v0.6 — 7 routines scheduled trackees en git + CLI `sync-routines.mjs` (Phase 3 Agents Platform v2)
-- [ ] v0.7 — Commandes `/focus`, `/digest`, `/speculate` (cockpit quotidien)
-- [ ] v0.8 — Templates projets (web SaaS, mobile, e-commerce)
-- [ ] v1.0 — Dashboard web de gouvernance des agents
+- [x] v0.7 — Phase 4 : headless bridge + hooks avances (`bash-audit-log`, `pre-compact-snapshot`, `session-end-summary`)
+- [x] v0.8 — Phase 5 : 4 routines auto-improvement (`retro-nightly`, `auto-test-weekly`, `cross-scan-weekly`, `upgrade-agents-weekly`)
+- [x] v0.9 — Alignement Claude Code v2.1.105+ : modeles canoniques full-ID, skills preload frontmatter, `/fire` API officielle (beta `experimental-cc-routine-2026-04-01`), `--plugin-url` install, fix elena-casey case-insensitive
+- [ ] v1.0 — Dashboard web de gouvernance des agents + Outcomes (rubriques de succes) + Dreaming (auto-amelioration cross-sessions, feature mai 2026)
 
 ---
 
 ## Changelog
+
+### v0.9.0 — 2026-05-18 (alignement Claude Code v2.1.105+)
+
+**Minor bump** : alignement sur les nouvelles features Claude Code livrees en avril-mai 2026 (Opus 4.7 + xhigh, Routines API officielle, skills frontmatter `context: fork`, hooks dans frontmatter agents/skills, `--plugin-url`).
+
+**Corrections** (audit interne 2026-05-18)
+- fix(README) : compte de hooks 8 -> 11 + 3 lignes manquantes au tableau (`bash-audit-log`, `pre-compact-snapshot`, `session-end-summary`).
+- fix(version) : `package.json` 0.6.1 -> 0.9.0, User-Agent `sync-routines.mjs` aligne. Plus de drift entre `plugin.json` / `marketplace.json` / `package.json`.
+- fix(hook) : `elena-casey-enforcer.sh` ligne 49 — regex `(ERP-AM|...)` passe en `grep -qiE` (case-insensitive) pour matcher `/tmp/erp-am/` aussi bien que `/Code/ERP-AM/`.
+- fix(roadmap) : v0.7 et v0.8 marquees done (etaient livrees mais non cochees).
+
+**Modernisation Claude Code v2.1**
+- feat(routines) : `sync-routines.mjs` ajoute `--fire <routine> --text "..."` qui pousse vers l'endpoint officiel `https://api.anthropic.com/v1/claude_code/routines/<id>/fire` avec beta header `experimental-cc-routine-2026-04-01`. Le sync CREATE/UPDATE continue via `claude.ai/api/triggers` (undocumented, research preview).
+- feat(env) : `.env.example` ajoute `ROUTINE_FIRE_TOKEN` (bearer scope routine, genere depuis le UI claude.ai).
+- feat(agents) : modeles canoniques full-ID (`claude-sonnet-4-6`, `claude-haiku-4-5-20251001`) sur les 10 agents qui utilisaient les bare aliases `sonnet`/`haiku` — leve l'ambiguite si Anthropic deprecate les aliases.
+- feat(agents) : skills preload via frontmatter `skills:` sur les agents qui en beneficient — `bernard:sebastien` preload `am-sql-preprod-deploy`, `bernard:elena` preload `simplify`, etc. (feature v2.1).
+- docs(readme) : nouvelle Option D `--plugin-url`/`--plugin-dir` (session-scoped, v2.1.128+), pre-requis remonte a Claude Code 2.1.105.
+- docs(readme) : note sur la **restriction plugin subagents** — `hooks`/`mcpServers`/`permissionMode` en frontmatter sont **ignores** pour les agents de plugin (regle securite Claude Code). Bernard utilise donc `hooks/hooks.json` au niveau plugin et `.mcp.json` au niveau plugin, pas au niveau agent.
+
+**Compatibilite** : aucun breaking change. Le `--fire` est opt-in ; les modifs frontmatter agents n'affectent que les nouveaux runs.
+
+**Compteurs**
+- Commandes : 7 (inchange)
+- Skills : 12 (inchange)
+- Hooks : 8 -> **11** documentes (les 11 etaient deja dans hooks.json, juste pas listes dans le README)
+- Agents : 18 (inchange)
+- Routines : 11 (inchange, ajout du `--fire` officiel pour les declencher manuellement)
+
+### v0.8.0 — 2026-04-19 (Phase 5 auto-amelioration)
+
+**Minor bump** : scaffold de 4 routines auto-improvement qui font tourner Bernard sur lui-meme.
+
+**Nouveautes**
+- feat(phase5) : 4 routines scheduled — `retro-nightly` (01h Paris : scan logs 24h, PRs auto sur prompts bancals), `auto-test-weekly` (ELENA clone + npm test des 4 repos chaque lundi 05h, PR fix si trivial), `cross-scan-weekly` (BERNARD cross-scan patterns inter-projets chaque lundi 06h), `upgrade-agents-weekly` (CLAIRE+NOVA veille releases Anthropic/Mistral/OpenAI chaque dimanche 07h, PRs agents).
+- feat(routines) : YAML metadata + prompts templates `${VAR}` pour les 4 nouvelles routines.
+- perf(hooks) : `elena-casey-enforcer.sh` et `memory-hygiene.sh` bornent le scan transcript a `tail -c 2M/4M` + fix SIGPIPE + timeout lint reduit a 8s.
+
+### v0.7.0 — 2026-04-18 (Phase 4 headless + hooks avances)
+
+**Minor bump** : bridge headless + hooks `PreCompact` / `SessionEnd` enrichis.
+
+**Nouveautes**
+- feat(hook) : `bash-audit-log.sh` (PostToolUse Bash) — log commande + exit + duree dans MCP agent-memory via curl, importance 0.2, non-bloquant 3s timeout. Source pour patterns d'erreur cross-projets.
+- feat(hook) : `pre-compact-snapshot.sh` (PreCompact) — nudge `store_memory` sur decisions critiques avant compaction. Lit `$CLAUDE_EFFORT` pour adapter le seuil (xhigh = nudge plus large).
+- feat(hook) : `session-end-summary.sh` (SessionEnd) — push direct vers MCP (curl) en plus de `stop-auto-memory.sh` qui demande a Claude. Garantit au moins 1 trace audit meme si Claude coupe sans `store_memory`. Detecte commits recents pour distinguer `interaction` vs `learning`.
 
 ### v0.6.1 — 2026-04-17 (security : prompts routines templates)
 

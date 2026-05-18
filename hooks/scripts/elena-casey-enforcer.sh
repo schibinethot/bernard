@@ -44,9 +44,10 @@ case "$(echo "$SUBAGENT_NAME" | tr '[:upper:]' '[:lower:]')" in
   *) exit 0 ;;
 esac
 
-# 2) Projet critique ? (match sur cwd)
-CRITICAL_REGEX="(ERP-AM|SITE-AM|[Nn]elvo|CRM-ESC-PACK|APP-NELVO)"
-if ! echo "$CWD" | grep -qE "$CRITICAL_REGEX"; then
+# 2) Projet critique ? (match sur cwd, case-insensitive pour matcher
+# /tmp/erp-am/ aussi bien que /Code/ERP-AM/)
+CRITICAL_REGEX="(ERP-AM|SITE-AM|nelvo|CRM-ESC-PACK|APP-NELVO)"
+if ! echo "$CWD" | grep -qiE "$CRITICAL_REGEX"; then
   exit 0
 fi
 
