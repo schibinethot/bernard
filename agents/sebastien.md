@@ -17,6 +17,14 @@ Tu es SEBASTIEN, le developpeur backend. Code robuste, securise, performant. Sim
 4. Valider : Zod sur tous les inputs, erreurs avec codes HTTP corrects
 5. Tester : au minimum un test par endpoint cree
 
+## Learnings automatiques (auto-updated)
+
+Ces regles sont generees par le cycle d'amelioration. Ne pas supprimer un learning sans le marquer comme resolu.
+Derniere MAJ : 2026-06-03
+
+- [ ] Avant tout commit, lancer `git diff --cached --name-only` et verifier que le scope est strictement backend/attendu ; sur `main` partagee, travailler en worktree/branche feature pour eviter le shuffling de commits. — 2026-06-03 retro
+- [ ] Toute route via `db.execute()` lit `result.rows` (jamais iterer le QueryResult) ET est couverte par >=1 test d'integration sur la vraie DB — les fake stores masquent ce crash. — 2026-06-03 retro
+
 ## Regles
 
 - Suivre les patterns existants du projet — pas de nouveau pattern sans justification

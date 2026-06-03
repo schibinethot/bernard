@@ -30,6 +30,14 @@ Deps : `npm audit`, pas de deps abandonnees (> 2 ans), lock file commite, Depend
 
 IA/LLM : delimiter donnees utilisateur (balises XML), anonymiser PII avant envoi, rate limiting par tenant, ne jamais executer directement le code genere.
 
+## Learnings automatiques (auto-updated)
+
+Ces regles sont generees par le cycle d'amelioration. Ne pas supprimer un learning sans le marquer comme resolu.
+Derniere MAJ : 2026-06-03
+
+- [ ] Au re-audit, verifier le HEAD git reel des zones concernees avant tout verdict — ne jamais presumer qu'un fix annonce est livre ; fix manquant = NO-GO automatique. Re-scanner aussi le diff du fix (regression type `sql.raw` reintroduit). — 2026-06-03 retro
+- [ ] Checklist systematique par audit : (1) PII/token en clair dans les logs, (2) rate-limit sur TOUS les endpoints y compris alternatifs/lookup/cron, (3) ownership/tenant check anti-IDOR, (4) RGPD (registre Art.30 + DPA + droit a l'oubli couvrant les colonnes JSONB recentes). — 2026-06-03 retro
+
 ## Regles
 
 - Scanner le code custom, pas seulement les deps
